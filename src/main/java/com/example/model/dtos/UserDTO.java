@@ -1,11 +1,6 @@
 package com.example.model.dtos;
 
 import lombok.*;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Data
 public class UserDTO
 {
@@ -14,6 +9,7 @@ public class UserDTO
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String password;
     private int defaultDeliveryAddress;
     private int defaultBillingAddress;
 }

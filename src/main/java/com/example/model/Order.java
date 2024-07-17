@@ -8,17 +8,12 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-enum PaymentType {
-    CASH,
-    CREDIT_CARD,
-    PAYPAL
-}
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-
 @Table(name = "orders")
 public class Order
 {

@@ -40,8 +40,6 @@ public class UserService
             user.setPassword(userDetails.getPassword());
             user.setDefaultDeliveryAddress(userDetails.getDefaultDeliveryAddress());
             user.setDefaultBillingAddress(userDetails.getDefaultBillingAddress());
-            user.setOrders(userDetails.getOrders());
-            user.setCarts(userDetails.getCarts());
 
             return userRepository.save(user);
         }).orElseThrow(()-> new EntityNotFoundException("User not found with id:"+id));

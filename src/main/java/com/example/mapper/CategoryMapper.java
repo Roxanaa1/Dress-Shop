@@ -4,7 +4,7 @@ import com.example.model.Category;
 import com.example.model.dtos.CategoryDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CategoryMapper
 {
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);

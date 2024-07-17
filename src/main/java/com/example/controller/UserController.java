@@ -1,49 +1,72 @@
 package com.example.controller;
 
+import com.example.mapper.UserMapper;
 import com.example.model.User;
-import com.example.repository.UserRepository;
+import com.example.model.dtos.UserDTO;
 import com.example.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
 public class UserController
 {
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserController(UserService userService,UserRepository userRepository)
+    public UserController(UserService userService, UserMapper userMapper)
     {
-        this.userService=userService;
-        this.userRepository=userRepository;
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
     @PostMapping("/createUser")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO)
+    {
+
+        User user = userMapper.userDTOToUser(userDTO);
+        User savedUser = userService.createUser(user);
+        UserDTO savedUserDTO = userMapper.userToUserDTO(savedUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUserDTO);
     }
 
     @GetMapping("/getUserById/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id)
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int id)
     {
-        User user = userService.findUserById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-        return ResponseEntity.ok(user);
+        Optional<User> user = userService.findUserById(id);
+        return user.map(u -> ResponseEntity.ok(userMapper.userToUserDTO(u)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @PutMapping("/updateUser/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User userDetails)
+    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserDTO userDTO)
     {
-        User updatedUser = userService.updateUser(userDetails, id);
-        return ResponseEntity.ok(updatedUser);
+        try {
+            User userDetails = userMapper.userDTOToUser(userDTO);
+            User updatedUser = userService.updateUser(userDetails, id);
+            UserDTO updatedUserDTO = userMapper.userToUserDTO(updatedUser);
+            return ResponseEntity.ok(updatedUserDTO);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id)
+    public ResponseEntity<?> deleteUser(@PathVariable int id)
     {
-        userService.deleteUser(id);
-        return ResponseEntity.ok().build();
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

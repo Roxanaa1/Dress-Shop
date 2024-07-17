@@ -16,10 +16,15 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/products")
 public class ProductController {
+    private final ProductService productService;
+
+    private final ProductMapper productMapper;
     @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductMapper productMapper;
+    public ProductController(ProductService productService,ProductMapper productMapper)
+    {
+        this.productService=productService;
+        this.productMapper=productMapper;
+    }
 
 
     @PostMapping("/addProduct")
@@ -68,9 +73,5 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
-
 
 }

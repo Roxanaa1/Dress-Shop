@@ -2,11 +2,6 @@ package com.example.model.dtos;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 import java.time.LocalDate;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Data
 public class ProductDTO
 {
