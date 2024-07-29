@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.MessageResponse;
 import com.example.mapper.UserMapper;
 import com.example.model.User;
 import com.example.model.dtos.UserDTO;
@@ -8,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,17 +17,62 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController
 {
     private final UserService userService;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper)
+    public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder)
     {
         this.userService = userService;
         this.userMapper = userMapper;
+        this.passwordEncoder=passwordEncoder;
     }
+
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO newUser)
+    {
+        boolean userExists = userService.existsByEmail(newUser.getEmail()).orElse(false);
+
+        if (userExists)
+        {
+            return ResponseEntity.badRequest().body("User already exists!");
+        }
+
+        User user = userMapper.userDTOToUser(newUser);
+        User savedUser = userService.createUser(user);
+        UserDTO savedUserDTO = userMapper.userToUserDTO(savedUser);
+
+        return ResponseEntity.ok(savedUserDTO);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody UserDTO loginUser)
+    {
+        Optional<User> userOptional = userService.findUserByEmail(loginUser.getEmail());
+
+        if (userOptional.isPresent())
+        {
+            User user = userOptional.get();
+            if (passwordEncoder.matches(loginUser.getPassword(), user.getPassword()))
+            {
+                UserDTO userDTO = userMapper.userToUserDTO(user);
+                return ResponseEntity.ok(userDTO);
+            } else
+            {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Invalid password!"));
+            }
+        } else
+        {
+            return ResponseEntity.badRequest().body(new MessageResponse("User does not exist!"));
+        }
+    }
+
+
     @PostMapping("/createUser")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO)
     {
