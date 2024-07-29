@@ -1,0 +1,49 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color:ghostwhite
+}
+
+form {
+    width: 400px;
+    padding: 40px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: white;
+    border-radius: 8px;
+}
+
+input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 10px 0;
+    background-color:lightblue;
+    color: white;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+h2{
+    text-align: center;
+}
+.register-link {
+    margin-top: 15px;
+}
+.register-link button {
+    padding: 5px 10px;
+    font-size: 17px;
+    cursor: pointer;
+    background-color: lightblue;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
