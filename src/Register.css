@@ -1,4 +1,4 @@
-/* Resetare stiluri */
+
 * {
     margin: 0;
     padding: 0;
@@ -14,7 +14,6 @@ body, html {
     align-items: center;
 }
 
-/* Container formular - Încapsulează toate elementele formularului */
 .register-form {
     width: 100%;
     max-width: 600px;
@@ -24,12 +23,12 @@ body, html {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin: 20px auto; /* Centrat automat pe orizontală */
+    margin: 20px auto;
 }
 
 .register-form h2 {
-    color: #6200ea;
-    margin-bottom: 20px; /* Asigură spațiere între titlu și input-uri */
+    color: black;
+    margin-bottom: 20px;
 }
 
 .register-form label {
@@ -38,11 +37,11 @@ body, html {
     text-align: left;
     padding-left: 5px;
     font-size: 14px;
-    margin-bottom: 10px; /* Spațiere între label și input */
+    margin-bottom: 10px;
 }
 
 .register-form input {
-    width: calc(100% - 10px); /* Reducem lățimea pentru a compensa padding-ul */
+    width: calc(100% - 10px);
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
@@ -53,7 +52,7 @@ body, html {
 .register-form button {
     width: 100%;
     padding: 10px;
-    background-color: mediumpurple;
+    background-color: lightblue;
     color: white;
     border: none;
     border-radius: 4px;
@@ -63,5 +62,5 @@ body, html {
 }
 
 .register-form button:hover {
-    background-color: #3700b3;
+    background-color: lightblue;
 }
