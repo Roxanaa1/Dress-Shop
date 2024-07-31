@@ -32,6 +32,8 @@ function Login() {
                 throw new Error(data.message || 'Login failed.');
             }
 
+            localStorage.setItem('isLoggedIn', 'true');
+
             console.log('Login successful:', data);
             setSuccess(data.message);
             setError(null);
@@ -42,43 +44,44 @@ function Login() {
         }
     };
 
-
     const handleRegisterRedirect = () => {
         navigate('/register');
     };
 
     return (
         <div className="login-container">
-            <form onSubmit={handleLogin}>
-                <h2>Login</h2>
-                {error && <p className="error">{error}</p>}
-                <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        value={credentials.email}
-                        onChange={handleInputChange}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        value={credentials.password}
-                        onChange={handleInputChange}
-                    />
-                </div>
-                <button type="submit">Login</button>
-                <div className="register-link">
-                    <p>You don't have an account? <button onClick={handleRegisterRedirect}>Sign up</button></p>
-                </div>
-            </form>
+            <div className="form-section">
+                <form onSubmit={handleLogin}>
+                    <h2>Login</h2>
+                    {error && <p className="error">{error}</p>}
+                    <div>
+                        <label htmlFor="email">Email:</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            required
+                            value={credentials.email}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            required
+                            value={credentials.password}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <button type="submit">Login</button>
+                    <div className="register-link">
+                        <p>You don't have an account? <button onClick={handleRegisterRedirect}>Sign up</button></p>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

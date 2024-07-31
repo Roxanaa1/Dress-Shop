@@ -1,3 +1,4 @@
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -23,21 +24,35 @@ body {
     cursor: pointer;
 }
 
-.navbar-icons {
-    display: flex;
-    align-items: center;
-}
 
 .navbar-icons a {
     color: white;
     margin: 0 15px;
+    position: relative;
 }
 
 .navbar-icons i {
     font-size: 20px;
 }
 
-@media (max-width: 600px) {
+.dropdown-content {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background-color: #fff !important;
+    color: black !important;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 8px 16px 0px rgba(0,0,0,0.2);
+    display: none;
+}
+
+.show-dropdown {
+    display: block;
+}
+
+@media (max-width: 600px)
+{
     .navbar {
         flex-direction: column;
         padding: 15px;
@@ -47,4 +62,44 @@ body {
         margin-top: 10px;
         justify-content: center;
     }
+}
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-content {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 200px;
+    background-color: lightgray;
+    color: black;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 8px 16px 0px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 1001;
+}
+
+.show-dropdown {
+    display: block;
+}
+button.logout-button, button.login-button, button.register-button {
+    width: 90%;
+    padding: 10px 10px;
+    font-size: 15px!important;
+    cursor: pointer;
+    background-color: gray !important;
+    color: white !important;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+button.logout-button:last-child, button.login-button:last-child, button.register-button:last-child {
+    margin-bottom: 0 !important;
 }

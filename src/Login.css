@@ -1,18 +1,35 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
 .login-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     height: 100vh;
-    background-color:ghostwhite
+    width: 100vw;
+    background-image: linear-gradient(to left, #7a7a7a, transparent), url('/public/Log2.jpg');
+    background-size: contain;
+    background-position: left;
+    background-repeat: no-repeat;
+    background-color: #7a7a7a;
+}
+
+
+.form-section {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    margin-right: 400px!important;
 }
 
 form {
     width: 400px;
-    padding: 40px;
-    border: 1px solid #ccc;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    background: white;
-    border-radius: 8px;
 }
 
 input[type="email"], input[type="password"] {
@@ -26,23 +43,27 @@ input[type="email"], input[type="password"] {
 button {
     width: 100%;
     padding: 10px 0;
-    background-color:lightblue;
+    background-color: gray;
     color: white;
     border-radius: 4px;
     border: none;
     cursor: pointer;
 }
-h2{
+
+h2 {
     text-align: center;
 }
+
 .register-link {
     margin-top: 15px;
+    text-align: center;
 }
+
 .register-link button {
     padding: 5px 10px;
     font-size: 17px;
     cursor: pointer;
-    background-color: lightblue;
+    background-color: gray;
     color: white;
     border: none;
     border-radius: 5px;

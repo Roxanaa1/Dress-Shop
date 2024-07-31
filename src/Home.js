@@ -13,7 +13,7 @@ const Home = () => {
         <div className="Home">
             <Navbar />
             <main>
-                <h1>Welcome to Home Page</h1>
+                <h1></h1>
                 <div className="image-gallery">
                     {dresses.map((dress, index) =>
                         (

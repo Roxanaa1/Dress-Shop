@@ -24,6 +24,7 @@ body, html {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
     margin: 20px auto;
+
 }
 
 .register-form h2 {
@@ -52,7 +53,7 @@ body, html {
 .register-form button {
     width: 100%;
     padding: 10px;
-    background-color: lightblue;
+    background-color: gray;
     color: white;
     border: none;
     border-radius: 4px;
@@ -62,5 +63,5 @@ body, html {
 }
 
 .register-form button:hover {
-    background-color: lightblue;
+    background-color: gray;
 }
