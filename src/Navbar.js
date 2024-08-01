@@ -41,7 +41,7 @@ const Navbar = () => {
 
     return (
         <header className="navbar">
-            <div className="navbar-brand" onClick={() => navigate('/')}>Brand</div>
+            <div className="navbar-brand" onClick={() => navigate('/')}></div>
             <div className="navbar-icons">
                 <a onClick={toggleDropdown} aria-label="Profile">
                     <i className="fas fa-user"></i>
