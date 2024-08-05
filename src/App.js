@@ -8,11 +8,8 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
 function App() {
-
-    const basename = process.env.NODE_ENV === 'production' ? '/E-Commerce-Shop' : '';
-
     return (
-        <Router basename={basename}>
+        <Router>
             <div className="App">
                 <Navbar />
                 <Sidebar />
