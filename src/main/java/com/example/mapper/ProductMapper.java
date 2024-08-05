@@ -17,7 +17,7 @@ public interface ProductMapper
 
     //default deoarece e interfata
     // mapeaza din Category in int si invers
-    default Category map(int categoryId) //creeaza si ret un obiect Category,seteaza la Id ul categoriei categoryId
+    default Category map(int categoryId) //creeaza si ret un obiect Category,seteaza la id ul categoriei categoryId
     {
         Category category = new Category();
         category.setId(categoryId);

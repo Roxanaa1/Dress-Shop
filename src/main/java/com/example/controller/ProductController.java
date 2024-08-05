@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -72,6 +73,12 @@ public class ProductController {
         {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false, defaultValue = "all") String filter)
+    {
+        List<Product> products = productService.getFilteredProducts(filter);
+        return ResponseEntity.ok(products);
     }
 
 }
