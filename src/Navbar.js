@@ -13,10 +13,12 @@ const Navbar = () => {
             setIsLoggedIn(loggedIn);
         };
 
-        //!!! verifica starea de autentificare și actualizeaza componenta când localStorage se schimba!!!!!!
         checkAuthStatus();
         window.addEventListener('storage', checkAuthStatus);
 
+        return () => {
+            window.removeEventListener('storage', checkAuthStatus);
+        };
     }, []);
 
     const toggleDropdown = () => {
@@ -32,7 +34,6 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-
         localStorage.removeItem('isLoggedIn');
         setIsLoggedIn(false);
         setShowDropdown(false);
@@ -41,7 +42,9 @@ const Navbar = () => {
 
     return (
         <header className="navbar">
-            <div className="navbar-brand" onClick={() => navigate('/')}></div>
+            <div className="navbar-left">
+                <div className="navbar-brand" onClick={() => navigate('/')}></div>
+            </div>
             <div className="navbar-icons">
                 <a onClick={toggleDropdown} aria-label="Profile">
                     <i className="fas fa-user"></i>
@@ -57,7 +60,6 @@ const Navbar = () => {
                             </>
                         )}
                     </div>
-
                 )}
                 <a href="#wishlist" aria-label="Wishlist">
                     <i className="fas fa-heart"></i>

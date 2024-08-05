@@ -103,3 +103,13 @@ button.logout-button, button.login-button, button.register-button {
 button.logout-button:last-child, button.login-button:last-child, button.register-button:last-child {
     margin-bottom: 0 !important;
 }
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left a {
+    color: white;
+    margin: 0 15px;
+    cursor: pointer;
+}
