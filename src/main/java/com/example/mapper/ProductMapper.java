@@ -10,11 +10,9 @@ public interface ProductMapper
 {
 
     @Mapping(source = "category.id", target = "categoryId")
-    @Mapping(source = "image", target = "image")
     ProductDTO productToProductDTO(Product product);
 
     @Mapping(source = "categoryId", target = "category.id")
-    @Mapping(source = "image", target = "image")
     Product productDTOToProduct(ProductDTO productDTO);
 
     //default deoarece e interfata
