@@ -36,6 +36,9 @@ public class Product {
     @Column(name = "addeddate")
     private LocalDate addedDate;
 
+    @Column
+    private String image;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

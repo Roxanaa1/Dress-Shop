@@ -14,7 +14,11 @@ public class ProductDTO
     private float price;
     private int availableQuantity;
     private LocalDate addedDate;
+    private String image;
     @NotNull
     private int categoryId;
+    private List<CartEntryDTO> cartEntries;
     private List<ProductProductAttribute> productAttributeAttributeValues;
+
+
 }
