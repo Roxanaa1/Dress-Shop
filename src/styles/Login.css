@@ -2,48 +2,31 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
+    width: 100%;
     font-family: Arial, sans-serif;
+}
+
+body.login-page {
+    overflow: hidden;
 }
 
 .login-page {
     display: flex;
-    height: 100vh;
-    background-color: #7a7a7a;
-}
-
-.login-image-container {
-    width: 50%;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 0;
+    align-items: center;
+    min-height: 100vh;
+    background: url('/src/login.jpg') no-repeat center center fixed;
+    background-size: cover;
     margin: 0;
-    overflow: hidden;
-
-}
-
-.login-image {
-    max-height: 105%;
-    max-width: 100%;
-    object-fit: cover;
     padding: 0;
-    margin: 0;
 }
 
 .login-container {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(to bottom,#80807f,#6f6f6e ,#5e6464,#525350);
-
-}
-.form-section {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: transparent;
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    margin-right: 400px!important;
+    margin-left: 400px;
 }
 
 form {

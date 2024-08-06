@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -6,9 +5,27 @@
 }
 
 body, html {
+    width: 100%;
     height: 100%;
     font-family: Arial, sans-serif;
-    background-color: ghostwhite;
+    margin: 0;
+    padding: 0;
+}
+
+body.register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('/src/register.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.register-background {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,15 +33,15 @@ body, html {
 
 .register-form {
     width: 100%;
-    max-width: 600px;
+    max-width: 450px;
     padding: 20px;
-    background-color: white;
+    background-color: transparent;
     border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    text-align: left;
     margin: 20px auto;
-
+    margin-right: 350px;
 }
 
 .register-form h2 {
@@ -42,7 +59,7 @@ body, html {
 }
 
 .register-form input {
-    width: calc(100% - 10px);
+    width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
@@ -63,5 +80,5 @@ body, html {
 }
 
 .register-form button:hover {
-    background-color: gray;
+    background-color: darkgray;
 }

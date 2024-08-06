@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import './Home.css';
+import React, { useState } from 'react';
+import '../styles/Home.css';
 
 const localDresses = [
     { src: '/images/Dress1.png', name: 'ROCHIE MIDI ELEGANTA CU FUNDE DECORATIVE PE UMERI', price: '200 Lei', id: 1, description: 'Rochie de seara eleganta' },
@@ -12,50 +11,8 @@ const localDresses = [
 ];
 
 const Home = () => {
-    const [dresses, setDresses] = useState(localDresses);
-    const [error, setError] = useState(null);
-    const location = useLocation();
-    const filter = new URLSearchParams(location.search).get('filter') || 'all';
-
-    useEffect(() => {
-        const fetchFilteredDresses = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/products/filter?filter=${filter}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch filtered dresses');
-                }
-
-                const data = await response.json();
-                setDresses([...localDresses, ...data]);
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-                setDresses(localDresses); // fallback to local dresses if fetch fails
-            }
-        };
-
-        fetchFilteredDresses();
-    }, [filter]);
-
-    const filteredDresses = dresses.filter(dress => {
-        if (filter === 'all') {
-            return true;
-        } else if (filter === 'evening') {
-            return dress.description.toLowerCase().includes('seara');
-        } else if (filter === 'day') {
-            return dress.description.toLowerCase().includes('zi');
-        } else if (filter === 'office') {
-            return dress.description.toLowerCase().includes('office');
-        } else {
-            return false;
-        }
-    });
+    const [dresses] = useState(localDresses);
+    const [error] = useState(null);
 
     return (
         <div className="Home">
@@ -63,7 +20,7 @@ const Home = () => {
                 <h1>Colectia de Rochii</h1>
                 {error && <p className="error">{error}</p>}
                 <div className="image-gallery">
-                    {filteredDresses.map((dress) => (
+                    {dresses.map((dress) => (
                         <div key={dress.id} className="image-wrapper">
                             <a href={`/ProductDetails/${dress.id}`}>
                                 <img src={dress.src} alt={dress.name} />
