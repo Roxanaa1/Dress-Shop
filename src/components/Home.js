@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Home.css';
 
-const localDresses = [
-    { src: '/images/Dress1.png', name: 'ROCHIE MIDI ELEGANTA CU FUNDE DECORATIVE PE UMERI', price: '200 Lei', id: 1, description: 'Rochie de seara eleganta' },
-    { src: '/images/Dress2.png', name: 'ROCHIE CU MANECI SCURTE BRODATE CU PERLE', price: '150 Lei', id: 2, description: 'Rochie de zi eleganta' },
-    { src: '/images/Dress3.png', name: 'ROCHIE CU DECOLTEU PATRAT SI PERLE', price: '180 Lei', id: 3, description: 'Rochie de zi' },
-    { src: '/images/Dress4.png', name: 'ROCHIE LIME CU FUNDA AMPLA IN CONTRAST', price: '150 Lei', id: 4, description: 'Rochie de zi' },
-    { src: '/images/Dress5.png', name: 'ROCHIE CASUAL MIDI EVAZATA CU UMERI GOI', price: '200 Lei', id: 5, description: 'Rochie de zi casual' },
-    { src: '/images/Dress6-1.png', name: 'ROCHIE CU SPATELE DECUPAT ', price: '180 Lei', id: 6, description: 'Rochie de seara' }
-];
-
 const Home = () => {
-    const [dresses] = useState(localDresses);
-    const [error] = useState(null);
+    const [dresses, setDresses] = useState([]);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        fetch('http://localhost:8080/products/getAllProducts')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => setDresses(data))
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                setError('Failed to load dresses');
+            });
+    }, []);
 
     return (
         <div className="Home">
@@ -23,11 +29,11 @@ const Home = () => {
                     {dresses.map((dress) => (
                         <div key={dress.id} className="image-wrapper">
                             <a href={`/ProductDetails/${dress.id}`}>
-                                <img src={dress.src} alt={dress.name} />
+                                <img src={dress.productImages[0]} alt={dress.name} />
                             </a>
                             <div className="dress-info">
                                 <p className="dress-name">{dress.name}</p>
-                                <p className="dress-price">{dress.price}</p>
+                                <p className="dress-price">{`${dress.price} Lei`}</p>
                             </div>
                         </div>
                     ))}
