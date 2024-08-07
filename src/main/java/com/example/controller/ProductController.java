@@ -38,13 +38,13 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDTO);
     }
 
-    @GetMapping("/getProductById/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable int id)
-    {
-        Optional<Product> product = productService.getProductById(id);
-        return product.map(p -> ResponseEntity.ok(productMapper.productToProductDTO(p)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+//    @GetMapping("/getProductById/{id}")
+//    public ResponseEntity<ProductDTO> getProductById(@PathVariable int id)
+//    {
+//        Optional<Product> product = productService.getProductById(id);
+//        return product.map(p -> ResponseEntity.ok(productMapper.productToProductDTO(p)))
+//                .orElseGet(() -> ResponseEntity.notFound().build());
+//    }
     @DeleteMapping("/deleteProduct/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable int id)
     {
@@ -86,19 +86,19 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getAllProducts()
     {
         List<Product> products = productService.findAll();
-        List<ProductDTO> productDTOs = products.stream().map(product -> {
-            ProductDTO dto = new ProductDTO();
-            dto.setId(product.getId());
-            dto.setName(product.getName());
-            dto.setDescription(product.getDescription());
-            dto.setPrice(product.getPrice());
-            dto.setProductImages(product.getProductImages().stream()
-                    .map(image -> "https://i.postimg.cc/" + image.getCode() + ".png")
-                    .collect(Collectors.toList()));
-            return dto;
-        }).collect(Collectors.toList());
+        List<ProductDTO> productDTOs = products.stream()
+                .map(productMapper::productToProductDTO) // folosim mapper ul pt a transforma entitatiile in DTO uri
+                .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
 
+    @GetMapping("/getProductById/{id}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable int id)
+    {
+        return productService.getProductById(id)
+                .map(productMapper::productToProductDTO) // folosim mapper ul pt a transforma entitatea in DTO
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
 }
