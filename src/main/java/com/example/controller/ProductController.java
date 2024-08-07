@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/products")
@@ -80,5 +81,24 @@ public class ProductController {
         List<Product> products = productService.getFilteredProducts(filter);
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/getAllProducts")
+    public ResponseEntity<List<ProductDTO>> getAllProducts()
+    {
+        List<Product> products = productService.findAll();
+        List<ProductDTO> productDTOs = products.stream().map(product -> {
+            ProductDTO dto = new ProductDTO();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setDescription(product.getDescription());
+            dto.setPrice(product.getPrice());
+            dto.setProductImages(product.getProductImages().stream()
+                    .map(image -> "https://i.postimg.cc/" + image.getCode() + ".png")
+                    .collect(Collectors.toList()));
+            return dto;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
+    }
+
 
 }
