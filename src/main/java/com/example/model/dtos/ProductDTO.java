@@ -1,6 +1,5 @@
 package com.example.model.dtos;
-import com.example.model.ProductImage;
-import com.example.model.ProductProductAttribute;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 import java.time.LocalDate;
@@ -18,8 +17,7 @@ public class ProductDTO
     @NotNull
     private int categoryId;
     private List<CartEntryDTO> cartEntries;
-    private List<ProductProductAttribute> productAttributeAttributeValues;
+    private List<ProductProductAttributeDTO> productAttributeAttributeValues;
     private List<String> productImages;
-
 
 }
