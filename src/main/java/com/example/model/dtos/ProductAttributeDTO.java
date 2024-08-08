@@ -5,8 +5,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ProductAttributeDTO {
+public class ProductAttributeDTO
+{
     private int id;
     private String name;
-    private List<AttributeValueDTO> values;
+    private List<Integer> productAttributeValueIds;
+    private List<Integer> productProductAttributeIds;
 }

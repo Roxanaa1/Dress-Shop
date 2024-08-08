@@ -1,6 +1,5 @@
 package com.example.model.dtos;
 
-import com.example.model.ProductAttributeValue;
 import lombok.Data;
 
 import java.util.List;
@@ -10,4 +9,5 @@ public class AttributeValueDTO
 {
     private int id;
     private String value;
+    private List<Integer> productAttributeValueIds;
 }
