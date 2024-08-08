@@ -8,9 +8,8 @@ const Sidebar = () => {
     return (
         <div className="sidebar">
             <button onClick={() => navigate('/dresses/all')}>DRESSES</button>
-            <button onClick={() => navigate('/dresses/evening')}>EVENING DRESSES</button>
-            <button onClick={() => navigate('/dresses/day')}>DAY DRESSES</button>
-
+            <button onClick={() => navigate('/dresses/EVENING%20DRESSES')}>EVENING DRESSES</button>
+            <button onClick={() => navigate('/dresses/DAY%20DRESSES')}>DAY DRESSES</button>
         </div>
     );
 };

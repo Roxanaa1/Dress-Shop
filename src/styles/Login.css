@@ -15,7 +15,7 @@ body.login-page {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url('/src/login.jpg') no-repeat center center fixed;
+    background: url('/public/images/login.jpg') no-repeat center center fixed;
     background-size: cover;
     margin: 0;
     padding: 0;

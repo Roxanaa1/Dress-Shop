@@ -19,7 +19,6 @@ const ProductDetails = () => {
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 setProduct(data); // set starea prod cu datele primite
                 setSelectedImage(data.productImages[0]); // set img initial selectata ca fiind prima img din array
             })
@@ -71,6 +70,7 @@ const ProductDetails = () => {
                             ))}
                         </div>
                     </div>
+
                     <button className="add-to-cart" disabled={!product.inStock}>Add to cart</button>
                     <button className="wishlist">Save to Wishlist</button>
                 </div>
@@ -78,4 +78,5 @@ const ProductDetails = () => {
         </div>
     );
 };
+
 export default ProductDetails;

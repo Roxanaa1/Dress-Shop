@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import '../styles/Home.css';
 
 const Home = () => {
     const [dresses, setDresses] = useState([]);
     const [error, setError] = useState('');
+    const { filter } = useParams();
 
-    useEffect(() => {
-        fetch('http://localhost:8080/products/getAllProducts')
+    useEffect(() =>
+    {
+        const url = filter === 'all' || !filter
+            ? 'http://localhost:8080/products/getAllProducts'
+            : `http://localhost:8080/products/getProductsByCategory?category=${filter}`;
+
+        fetch(url)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
-            .then(data => setDresses(data))
+            .then(data =>
+            {
+                setDresses(data);
+            })
             .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
                 setError('Failed to load dresses');
             });
-    }, []);
+    }, [filter]);
 
     return (
         <div className="Home">
