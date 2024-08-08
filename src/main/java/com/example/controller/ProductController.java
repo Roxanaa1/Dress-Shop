@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/products")
-public class ProductController {
+@CrossOrigin(origins = "http://localhost:3000")
+public class ProductController
+{
     private final ProductService productService;
 
     private final ProductMapper productMapper;
@@ -75,12 +77,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/filter")
-    public ResponseEntity<List<Product>> getProducts(@RequestParam(required = false, defaultValue = "all") String filter)
-    {
-        List<Product> products = productService.getFilteredProducts(filter);
-        return ResponseEntity.ok(products);
-    }
 
     @GetMapping("/getAllProducts")
     public ResponseEntity<List<ProductDTO>> getAllProducts()
@@ -101,4 +97,13 @@ public class ProductController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/getProductsByCategory")
+    public ResponseEntity<List<ProductDTO>> getProductsByCategory(@RequestParam String category)
+    {
+        List<Product> products = productService.getProductsByCategory(category);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(productMapper::productToProductDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
+    }
 }

@@ -76,24 +76,16 @@ public class ProductService
         }
     }
 
-    public List<Product> getFilteredProducts(String filter) {
-        List<Product> products;
-        if ("all".equals(filter)) {
-            products = productRepository.findAll();
-        } else if ("evening".equals(filter)) {
-            products = productRepository.findByDescriptionContainingIgnoreCase("seara");
-        } else if ("day".equals(filter)) {
-            products = productRepository.findByDescriptionContainingIgnoreCase("zi");
-        } else if ("office".equals(filter)) {
-            products = productRepository.findByDescriptionContainingIgnoreCase("office");
-        } else {
-            products = new ArrayList<>();
-        }
-        return products;
-    }
-
-    public List<Product> findAll() {
+    public List<Product> findAll()
+    {
         return productRepository.findAll();
     }
 
+    public List<Product> getProductsByCategory(String category)
+    {
+        System.out.println("Category received: " + category); // Log pentru a verifica categoria
+        List<Product> products = productRepository.findByCategoryNameIgnoreCase(category);
+        System.out.println("Products found: " + products.size()); // Log pentru a verifica numărul de produse găsite
+        return products;
+    }
 }

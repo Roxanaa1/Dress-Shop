@@ -11,8 +11,5 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository  extends JpaRepository<Product,Integer>
 {
-
-
-    @Query("SELECT p FROM Product p WHERE LOWER(p.description) LIKE LOWER(CONCAT('%', :description, '%'))")
-    List<Product> findByDescriptionContainingIgnoreCase(String description);
+    List<Product> findByCategoryNameIgnoreCase(String categoryName);
 }
