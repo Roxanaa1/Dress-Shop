@@ -9,6 +9,8 @@ public class ProductAttributeDTO
 {
     private int id;
     private String name;
-    private List<Integer> productAttributeValueIds;
-    private List<Integer> productProductAttributeIds;
+//    private List<Integer> productAttributeValueIds;
+//    private List<Integer> productProductAttributeIds;
+
+
 }

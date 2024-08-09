@@ -9,5 +9,5 @@ public class AttributeValueDTO
 {
     private int id;
     private String value;
-    private List<Integer> productAttributeValueIds;
+//    private List<Integer> productAttributeValueIds;
 }
