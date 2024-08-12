@@ -40,6 +40,15 @@ const Navbar = () => {
         navigate('/');
     };
 
+    const handleCartRedirect = () => {
+        if (isLoggedIn) {
+            navigate('/cart');
+        } else {
+            alert("Trebuie să fii logat pentru a accesa cosul de cumparaturi.");
+            navigate('/login');
+        }
+    };
+
     return (
         <header className="navbar">
             <div className="navbar-left">
@@ -63,6 +72,9 @@ const Navbar = () => {
                 )}
                 <a href="#wishlist" aria-label="Wishlist">
                     <i className="fas fa-heart"></i>
+                </a>
+                <a onClick={handleCartRedirect} aria-label="Cart">
+                    <i className="fas fa-shopping-cart"></i>
                 </a>
                 <a href="#search" aria-label="Search">
                     <i className="fas fa-search"></i>

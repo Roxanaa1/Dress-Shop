@@ -6,6 +6,7 @@ import Login from './Login';
 import ProductDetails from './ProductDetails';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import Cart from './Cart';
 
 const AppContent = () => {
     const location = useLocation();
@@ -21,6 +22,7 @@ const AppContent = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/ProductDetails/:id" element={<ProductDetails />} />
                 <Route path="/dresses/:filter" element={<Home />} />
+                <Route path="/cart" element={<Cart />} />
                 <Route path="*" element={<div>Pagina nu a fost găsită</div>} />
             </Routes>
         </div>

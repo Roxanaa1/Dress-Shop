@@ -113,3 +113,22 @@ button.logout-button:last-child, button.login-button:last-child, button.register
     margin: 0 15px;
     cursor: pointer;
 }
+.navbar-icons a {
+    color: white;
+    margin: 0 15px;
+    position: relative;
+    cursor: pointer;
+}
+
+.navbar-icons i {
+    font-size: 20px;
+}
+
+.navbar-icons .fa-shopping-cart {
+    font-size: 22px;
+}
+
+.navbar-icons .fa-shopping-cart:hover {
+    color: white;
+}
+

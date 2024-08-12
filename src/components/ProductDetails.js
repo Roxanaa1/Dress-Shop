@@ -5,12 +5,12 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
 const ProductDetails = () => {
-    const { id } = useParams(); // extrage id-ul prod din URL
-    const [product, setProduct] = useState(null); // init starea pt produs ca fiind null
-    const [selectedImage, setSelectedImage] = useState(''); // init starea pt img selectata
+    const { id } = useParams();
+    const [product, setProduct] = useState(null);
+    const [selectedImage, setSelectedImage] = useState('');
 
     useEffect(() => {
-        // fetch pt a optine detaliile prod bazat pe id
+        // Fetch detalii produs
         fetch(`http://localhost:8080/products/getProductById/${id}`)
             .then(response => {
                 if (!response.ok) {
@@ -19,15 +19,18 @@ const ProductDetails = () => {
                 return response.json();
             })
             .then(data => {
-                setProduct(data); // set starea prod cu datele primite
-                setSelectedImage(data.productImages[0]); // set img initial selectata ca fiind prima img din array
+                setProduct(data);
+                setSelectedImage(data.productImages[0]);
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
-    }, [id]); // efectul se va executa din nou dacă id-ul prod se schimba
+    }, [id]);
 
     if (!product) return <div>Product not found</div>;
+
+    const colorAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color');
+    const sizeAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size');
 
     return (
         <div className="ProductDetails">
@@ -35,10 +38,8 @@ const ProductDetails = () => {
             <Sidebar />
             <div className="details-container">
                 <div className="image-gallery">
-
                     {selectedImage && <img src={selectedImage} alt={product.name} className="main-image" />}
                     <div className="thumbnail-gallery">
-
                         {product.productImages && product.productImages.map((image, index) => (
                             <img
                                 key={index}
@@ -52,26 +53,26 @@ const ProductDetails = () => {
                 </div>
                 <div className="product-info">
                     <h1>{product.name}</h1>
-                    <p className="price">{product.price}</p>
+                    <p className="price">{product.price} RON</p>
                     <p className="description">{product.description}</p>
-                    <p className={`stock-status ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
-                        {product.inStock ? 'In Stock' : 'Out of Stock'}
+                    <p className={`stock-status ${product.availableQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                        {product.availableQuantity > 0 ? 'In Stock' : 'Out of Stock'}
                     </p>
                     <div className="options">
-                        <div className="colors">
-                            <span>Color:</span>
-                            <span className="color-sample" style={{ backgroundColor: product.color }}></span>
-                        </div>
-                        <div className="sizes">
-                            <span>Size:</span>
-
-                            {product.sizes && product.sizes.map(size => (
-                                <button key={size} className="size-button">{size}</button>
-                            ))}
-                        </div>
+                        {colorAttribute && (
+                            <div className="colors">
+                                <span>Color:</span>
+                                <span className="color-sample" style={{ backgroundColor: colorAttribute.productAttribute.value }}></span>
+                            </div>
+                        )}
+                        {sizeAttribute && (
+                            <div className="sizes">
+                                <span>Size:</span>
+                                <button className="size-button">{sizeAttribute.productAttribute.value}</button>
+                            </div>
+                        )}
                     </div>
-
-                    <button className="add-to-cart" disabled={!product.inStock}>Add to cart</button>
+                    <button className="add-to-cart" disabled={product.availableQuantity === 0}>Add to cart</button>
                     <button className="wishlist">Save to Wishlist</button>
                 </div>
             </div>
