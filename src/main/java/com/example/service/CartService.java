@@ -1,9 +1,15 @@
 package com.example.service;
 
 import com.example.mapper.CartMapper;
+import com.example.mapper.ProductMapper;
 import com.example.model.Cart;
+import com.example.model.CartEntry;
+import com.example.model.Product;
 import com.example.model.dtos.CartDTO;
+import com.example.model.dtos.CartEntryDTO;
+import com.example.repository.CartEntryRepository;
 import com.example.repository.CartRepository;
+import com.example.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +22,50 @@ public class CartService
 
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
+    private final CartEntryRepository cartEntryRepository;
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Autowired
-    public CartService(CartRepository cartRepository, CartMapper cartMapper)
+    public CartService(CartRepository cartRepository, CartMapper cartMapper,CartEntryRepository cartEntryRepository,ProductRepository productRepository,ProductMapper productMapper)
     {
         this.cartRepository = cartRepository;
         this.cartMapper = cartMapper;
+        this.cartEntryRepository=cartEntryRepository;
+        this.productRepository=productRepository;
+        this.productMapper=productMapper;
+    }
+
+    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO)
+    {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        CartEntry cartEntry = cartMapper.cartEntryDTOToCartEntry(cartEntryDTO);
+
+        Product product = productRepository.findById(cartEntryDTO.getProduct().getId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (product.getAvailableQuantity() < cartEntryDTO.getQuantity()) {
+            throw new RuntimeException("Insufficient quantity available");
+        }
+
+        cartEntry.setProduct(product);
+        cartEntry.setCart(cart);
+
+        float totalPricePerEntry = cartEntryDTO.getQuantity() * cartEntryDTO.getPricePerPiece();
+        cartEntry.setTotalPricePerEntry(totalPricePerEntry);
+
+        product.setAvailableQuantity(product.getAvailableQuantity() - cartEntryDTO.getQuantity());
+
+        cart.getCartEntries().add(cartEntry);
+
+        float updatedTotalPrice = cart.getTotalPrice() + totalPricePerEntry;
+        cart.setTotalPrice(updatedTotalPrice);
+
+        Cart updatedCart = cartRepository.save(cart);
+
+        return cartMapper.cartToCartDTO(updatedCart);
     }
 
     public List<CartDTO> getAllCarts()

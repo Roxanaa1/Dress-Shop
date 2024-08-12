@@ -1,9 +1,14 @@
 package com.example.controller;
 
 import com.example.MessageResponse;
+import com.example.mapper.CartMapper;
 import com.example.mapper.UserMapper;
+import com.example.model.Cart;
 import com.example.model.User;
+import com.example.model.dtos.CartDTO;
 import com.example.model.dtos.UserDTO;
+import com.example.repository.CartRepository;
+import com.example.service.CartService;
 import com.example.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +28,19 @@ public class UserController
     private final UserService userService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CartService cartService;
+    private final CartRepository cartRepository;
+    private final CartMapper cartMapper;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder)
+    public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder,CartService cartService,CartRepository cartRepository,CartMapper cartMapper)
     {
         this.userService = userService;
         this.userMapper = userMapper;
         this.passwordEncoder=passwordEncoder;
+        this.cartService=cartService;
+        this.cartRepository=cartRepository;
+        this.cartMapper=cartMapper;
     }
 
 
@@ -55,22 +66,34 @@ public class UserController
     {
         Optional<User> userOptional = userService.findUserByEmail(loginUser.getEmail());
 
-        if (userOptional.isPresent())
-        {
+        if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(loginUser.getPassword(), user.getPassword()))
             {
+
+                if (user.getCart() == null) {
+
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+
+                    Cart savedCart = cartRepository.save(newCart);
+
+                    user.setCart(savedCart);
+                    userService.updateUser(user, user.getId());
+                }
+
                 UserDTO userDTO = userMapper.userToUserDTO(user);
+
                 return ResponseEntity.ok(userDTO);
-            } else
-            {
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Invalid password!"));
             }
-        } else
-        {
+        } else {
             return ResponseEntity.badRequest().body(new MessageResponse("User does not exist!"));
         }
     }
+
+
 
 
     @PostMapping("/createUser")

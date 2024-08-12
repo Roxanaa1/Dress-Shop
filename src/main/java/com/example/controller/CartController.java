@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.model.dtos.CartDTO;
+import com.example.model.dtos.CartEntryDTO;
 import com.example.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,14 @@ public class CartController
         CartDTO newCart = cartService.createCart(cartDTO);
         return ResponseEntity.ok(newCart);
     }
+
+    @PostMapping("/addToCart/{cartId}")
+    public ResponseEntity<CartDTO> addToCart(@PathVariable int cartId, @RequestBody CartEntryDTO cartEntryDTO)
+    {
+        CartDTO updatedCart = cartService.addToCart(cartId, cartEntryDTO);
+        return ResponseEntity.ok(updatedCart);
+    }
+
 
     @PutMapping("/updateCart/{id}")
     public ResponseEntity<CartDTO> updateCart(@PathVariable int id, @RequestBody CartDTO cartDTO)

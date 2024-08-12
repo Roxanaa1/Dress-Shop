@@ -12,13 +12,15 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")//trebuie sa fie gestionata de Spring ca un bean
+@Mapper(componentModel = "spring")
 public interface UserMapper
 {
+
+
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(source = "orders", target = "orderIds", qualifiedByName = "ordersToOrderIds")
-    @Mapping(source = "carts", target = "cartIds", qualifiedByName = "cartsToCartIds")
+    @Mapping(source = "cart.id", target = "cartId")
     UserDTO userToUserDTO(User user);
 
     @Mapping(source = "password", target = "password")
@@ -30,9 +32,9 @@ public interface UserMapper
         return orders.stream().map(Order::getId).collect(Collectors.toList());
     }
 
-    @Named("cartsToCartIds")
-    default List<Integer> cartsToCartIds(List<Cart> carts)
+    @Named("cartToCartId")
+    default Integer cartToCartId(Cart cart)
     {
-        return carts.stream().map(Cart::getId).collect(Collectors.toList());
+        return cart != null ? cart.getId() : null;
     }
 }

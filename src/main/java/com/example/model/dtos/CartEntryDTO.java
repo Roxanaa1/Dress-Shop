@@ -7,7 +7,7 @@ public class CartEntryDTO
 {
     private int id;
     private int cartId;
-    private int productId;
+    private ProductDTO product;
     private int quantity;
     private float pricePerPiece;
     private float totalPricePerEntry;

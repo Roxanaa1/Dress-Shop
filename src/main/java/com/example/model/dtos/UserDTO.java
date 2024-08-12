@@ -16,5 +16,5 @@ public class UserDTO
     private int defaultDeliveryAddress;
     private int defaultBillingAddress;
     private List<Integer> orderIds;
-    private List<Integer> cartIds;
+    private Integer cartId;
 }
