@@ -39,7 +39,8 @@ public class CartService
     }
 
     @Transactional
-    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO) {
+    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO)
+    {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -48,10 +49,11 @@ public class CartService
         Product product = productRepository.findById(cartEntryDTO.getProduct().getId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Utilizează ProductMapper pentru a converti Product în ProductDTO dacă este necesar
+        // utilizeaza ProductMapper pt a converti Product în ProductDTO
         ProductDTO productDTO = productMapper.productToProductDTO(product);
 
-        if (product.getAvailableQuantity() < cartEntryDTO.getQuantity()) {
+        if (product.getAvailableQuantity() < cartEntryDTO.getQuantity())
+        {
             throw new RuntimeException("Insufficient quantity available");
         }
 

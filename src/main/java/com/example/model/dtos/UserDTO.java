@@ -1,6 +1,7 @@
 package com.example.model.dtos;
 
 import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ public class UserDTO
     private int id;
     private String firstName;
     private String lastName;
+    @NotNull
     private String email;
     private String phoneNumber;
     private String password;

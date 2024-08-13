@@ -15,7 +15,6 @@ public interface ProductMapper
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "productImages", target = "productImages", qualifiedByName = "imagesToUrls")
     @Mapping(source = "productAttributeAttributeValues", target = "productAttributeAttributeValues", qualifiedByName = "mapProductProductAttributes")
-    @Mapping(target = "cartEntries", ignore = true)
     ProductDTO productToProductDTO(Product product);
 
     @Mapping(source = "categoryId", target = "category.id")
@@ -37,29 +36,25 @@ public interface ProductMapper
     ProductAttributeValueDTO productAttributeValueToProductAttributeValueDTO(ProductAttributeValue productAttributeValue);
 
     @Named("mapProductProductAttributes")
-    default List<ProductProductAttributeDTO> mapProductProductAttributes(List<ProductProductAttribute> productProductAttributes)
-    {
+    default List<ProductProductAttributeDTO> mapProductProductAttributes(List<ProductProductAttribute> productProductAttributes) {
         return productProductAttributes.stream()
                 .map(this::productProductAttributeToDTO)
                 .collect(Collectors.toList());
     }
 
-    default ProductProductAttributeDTO productProductAttributeToDTO(ProductProductAttribute productProductAttribute)
-    {
+    default ProductProductAttributeDTO productProductAttributeToDTO(ProductProductAttribute productProductAttribute) {
         ProductProductAttributeDTO dto = new ProductProductAttributeDTO();
         dto.setId(productProductAttribute.getId());
         dto.setProductAttribute(productAttributeToDTO(productProductAttribute.getProductAttribute()));
         return dto;
     }
 
-    default ProductAttributeDTO productAttributeToDTO(ProductAttribute productAttribute)
-    {
+    default ProductAttributeDTO productAttributeToDTO(ProductAttribute productAttribute) {
         ProductAttributeDTO dto = new ProductAttributeDTO();
         dto.setId(productAttribute.getId());
         dto.setName(productAttribute.getName());
 
-        if (productAttribute.getProductAttributeValues() != null && !productAttribute.getProductAttributeValues().isEmpty())
-        {
+        if (productAttribute.getProductAttributeValues() != null && !productAttribute.getProductAttributeValues().isEmpty()) {
             ProductAttributeValue firstValue = productAttribute.getProductAttributeValues().get(0);
             dto.setValueId(firstValue.getAttributeValue().getId());
             dto.setValue(firstValue.getAttributeValue().getValue());
@@ -69,11 +64,9 @@ public interface ProductMapper
     }
 
     @Named("imagesToUrls")
-    default List<String> imagesToUrls(List<ProductImage> images)
-    {
+    default List<String> imagesToUrls(List<ProductImage> images) {
         return images.stream()
                 .map(image -> "https://i.postimg.cc/" + image.getCode() + ".png")
                 .collect(Collectors.toList());
     }
-
 }

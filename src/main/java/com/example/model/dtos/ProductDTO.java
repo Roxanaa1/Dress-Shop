@@ -13,7 +13,7 @@ public class ProductDTO
     private int availableQuantity;
     private LocalDate addedDate;
     private int categoryId;
-    private List<CartEntryDTO> cartEntries;
+//    private List<CartEntryDTO> cartEntries;
     private List<ProductProductAttributeDTO> productAttributeAttributeValues;
     private List<String> productImages;
 
