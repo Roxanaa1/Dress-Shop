@@ -10,16 +10,37 @@ const Cart = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    useEffect(() => {
+    useEffect(() =>
+    {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         setIsLoggedIn(loggedIn);
 
         if (!loggedIn) {
-            alert("Trebuie să fii logat pentru a accesa coșul de cumpărături.");
+            alert("Trebuie să fii logat pentru a accesa cosul de cumparaturi.");
             navigate('/login');
         } else {
-            const savedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-            setCartItems(savedCartItems);
+            const cartId = localStorage.getItem('cartId');
+            if (cartId) {
+                fetch(`http://localhost:8080/cart/getCartById/${cartId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const mappedItems = data.cartEntries.map(entry => ({
+                            id: entry.id,
+                            image: entry.product.productImages[0],
+                            name: entry.product.name,
+                            sku: entry.product.sku,
+                            color: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color')?.productAttribute.value || 'Culoare indisponibilă',
+                            size: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size')?.productAttribute.value || 'Mărime indisponibilă',
+                            price: entry.pricePerPiece,
+                            quantity: entry.quantity,
+                            totalPricePerEntry: entry.totalPricePerEntry
+                        }));
+                        setCartItems(mappedItems);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cart:', error);
+                    });
+            }
         }
     }, [navigate]);
 
@@ -45,7 +66,7 @@ const Cart = () => {
         }
     };
 
-    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const shippingCost = 15;
     const total = subtotal - (subtotal * discount) + shippingCost;
 
@@ -68,10 +89,9 @@ const Cart = () => {
                     ) : (
                         cartItems.map(item => (
                             <div className="cart-item" key={item.id}>
-                                <img src={item.image} alt={item.name}/>
+                                <img src={item.image} alt={item.name} />
                                 <div className="item-details">
                                     <h2>{item.name}</h2>
-                                    <p>Nr. art.: {item.sku}</p>
                                     <p>Culoare: {item.color}</p>
                                     <p>Mărime: {item.size}</p>
                                     <p>Preț: {item.price} Lei</p>
@@ -83,8 +103,7 @@ const Cart = () => {
                                             onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
                                         />
                                     </div>
-                                    <button onClick={() => handleRemoveItem(item.id)} className="remove-button">Șterge
-                                    </button>
+                                    <button onClick={() => handleRemoveItem(item.id)} className="remove-button">Șterge</button>
                                 </div>
                             </div>
                         ))
@@ -105,9 +124,7 @@ const Cart = () => {
                         <p>Livrare: {shippingCost === 0 ? 'GRATUIT' : `${shippingCost} Lei`}</p>
                         {discount > 0 && <p>Discount: {discount * 100}%</p>}
                         <p><strong>Total: {total.toFixed(2)} Lei</strong></p>
-                        <button onClick={handleCheckout} className="checkout-button">Continuă la pagina de finalizare a
-                            comenzii
-                        </button>
+                        <button onClick={handleCheckout} className="checkout-button">Continuă la pagina de finalizare a comenzii</button>
                     </div>
                     <div className="payment-info">
                         <p>Acceptăm</p>
@@ -118,12 +135,10 @@ const Cart = () => {
                             <i className="fas fa-gift"></i>
                         </div>
                         <p className="additional-info">
-                            Prețurile și costurile de livrare nu sunt confirmate până când nu ajungeți la pagina de
-                            finalizare a comenzii.
+                            Prețurile și costurile de livrare nu sunt confirmate până când nu ajungeți la pagina de finalizare a comenzii.
                         </p>
                         <p className="return-policy">
-                            Detalii despre returnare în 30 zile și politica de anulare a comenzii. <a href="#">returnare
-                            și rambursare</a>.
+                            Detalii despre returnare în 30 zile și politica de anulare a comenzii. <a href="#">returnare și rambursare</a>.
                         </p>
                     </div>
                 </div>

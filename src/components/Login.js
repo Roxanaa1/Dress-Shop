@@ -12,10 +12,7 @@ function Login() {
     const navigate = useNavigate();
 
     useEffect(() => {
-
         document.body.classList.add('login-page');
-
-
         return () => {
             document.body.classList.remove('login-page');
         };
@@ -42,7 +39,9 @@ function Login() {
                 throw new Error(data.message || 'Login failed.');
             }
 
+            // Stocare cartId și isLoggedIn în localStorage
             localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('cartId', data.cartId); // Presupunând că backend-ul returnează un cartId
 
             console.log('Login successful:', data);
             setSuccess(data.message);

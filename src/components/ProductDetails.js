@@ -32,6 +32,63 @@ const ProductDetails = () => {
     const colorAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color');
     const sizeAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size');
 
+    const handleAddToCart = () =>
+    {
+        const cartId = localStorage.getItem('cartId'); // ia `cartId` din `localStorage`
+
+        if (!cartId) {
+            alert("Trebuie să fii logat pentru a adauga produse in cos.");
+            return;
+        }
+
+        if (!product || !product.id) {
+            alert("Error");
+            return;
+        }
+
+        // construieste un obiect ProductDTO
+        const productDTO =
+            {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            availableQuantity: product.availableQuantity,
+
+        };
+
+        // construieste un obiect CartEntryDTO complet
+        const cartEntryDTO =
+            {
+            product: productDTO,
+            quantity: 1,
+            pricePerPiece: product.price,
+            totalPricePerEntry: product.price * 1
+        };
+
+        fetch(`http://localhost:8080/cart/addToCart/${cartId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cartEntryDTO), // trimite CartEntryDTO complet
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Product added to cart:', data);
+                alert('Produsul a fost adaugat in cosul de cumparaturi!');
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('Error');
+            });
+    };
+
+
     return (
         <div className="ProductDetails">
             <Navbar />
@@ -72,7 +129,9 @@ const ProductDetails = () => {
                             </div>
                         )}
                     </div>
-                    <button className="add-to-cart" disabled={product.availableQuantity === 0}>Add to cart</button>
+                    <button className="add-to-cart" onClick={handleAddToCart} disabled={product.availableQuantity === 0}>
+                        Add to cart
+                    </button>
                     <button className="wishlist">Save to Wishlist</button>
                 </div>
             </div>
