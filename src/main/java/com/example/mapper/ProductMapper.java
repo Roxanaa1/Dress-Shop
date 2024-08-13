@@ -15,6 +15,7 @@ public interface ProductMapper
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "productImages", target = "productImages", qualifiedByName = "imagesToUrls")
     @Mapping(source = "productAttributeAttributeValues", target = "productAttributeAttributeValues", qualifiedByName = "mapProductProductAttributes")
+    @Mapping(target = "cartEntries", ignore = true)
     ProductDTO productToProductDTO(Product product);
 
     @Mapping(source = "categoryId", target = "category.id")

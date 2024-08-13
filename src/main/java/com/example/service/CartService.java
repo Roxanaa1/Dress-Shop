@@ -7,11 +7,13 @@ import com.example.model.CartEntry;
 import com.example.model.Product;
 import com.example.model.dtos.CartDTO;
 import com.example.model.dtos.CartEntryDTO;
+import com.example.model.dtos.ProductDTO;
 import com.example.repository.CartEntryRepository;
 import com.example.repository.CartRepository;
 import com.example.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,8 +38,8 @@ public class CartService
         this.productMapper=productMapper;
     }
 
-    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO)
-    {
+    @Transactional
+    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -45,6 +47,9 @@ public class CartService
 
         Product product = productRepository.findById(cartEntryDTO.getProduct().getId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Utilizează ProductMapper pentru a converti Product în ProductDTO dacă este necesar
+        ProductDTO productDTO = productMapper.productToProductDTO(product);
 
         if (product.getAvailableQuantity() < cartEntryDTO.getQuantity()) {
             throw new RuntimeException("Insufficient quantity available");
@@ -67,7 +72,6 @@ public class CartService
 
         return cartMapper.cartToCartDTO(updatedCart);
     }
-
     public List<CartDTO> getAllCarts()
     {
         List<Cart> carts = cartRepository.findAll();
