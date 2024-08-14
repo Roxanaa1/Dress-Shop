@@ -7,4 +7,5 @@ public class ProductProductAttributeDTO
 {
     private int id;
     private ProductAttributeDTO productAttribute;
+    private AttributeValueDTO attributeValue;
 }

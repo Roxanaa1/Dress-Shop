@@ -9,8 +9,5 @@ public class ProductAttributeDTO
 {
     private int id;
     private String name;
-    private Integer valueId;
-    private String value;
-
 
 }

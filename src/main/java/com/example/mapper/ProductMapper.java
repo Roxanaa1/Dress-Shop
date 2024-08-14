@@ -8,10 +8,8 @@ import org.w3c.dom.Attr;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Mapper(componentModel = "spring")
-public interface ProductMapper
-{
+public interface ProductMapper {
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "productImages", target = "productImages", qualifiedByName = "imagesToUrls")
     @Mapping(source = "productAttributeAttributeValues", target = "productAttributeAttributeValues", qualifiedByName = "mapProductProductAttributes")
@@ -33,34 +31,19 @@ public interface ProductMapper
     @Mapping(source = "productAttribute.name", target = "productAttribute.name")
     @Mapping(source = "attributeValue.id", target = "attributeValue.id")
     @Mapping(source = "attributeValue.value", target = "attributeValue.value")
-    ProductAttributeValueDTO productAttributeValueToProductAttributeValueDTO(ProductAttributeValue productAttributeValue);
+    ProductProductAttributeDTO productProductAttributeToProductProductAttributeDTO(ProductProductAttribute productProductAttribute);
+
+    @Mapping(source = "productAttribute.id", target = "productAttribute.id")
+    @Mapping(source = "productAttribute.name", target = "productAttribute.name")
+    @Mapping(source = "attributeValue.id", target = "attributeValue.id")
+    @Mapping(source = "attributeValue.value", target = "attributeValue.value")
+    ProductProductAttribute productProductAttributeDTOToProductProductAttribute(ProductProductAttributeDTO dto);
 
     @Named("mapProductProductAttributes")
     default List<ProductProductAttributeDTO> mapProductProductAttributes(List<ProductProductAttribute> productProductAttributes) {
         return productProductAttributes.stream()
-                .map(this::productProductAttributeToDTO)
+                .map(this::productProductAttributeToProductProductAttributeDTO)
                 .collect(Collectors.toList());
-    }
-
-    default ProductProductAttributeDTO productProductAttributeToDTO(ProductProductAttribute productProductAttribute) {
-        ProductProductAttributeDTO dto = new ProductProductAttributeDTO();
-        dto.setId(productProductAttribute.getId());
-        dto.setProductAttribute(productAttributeToDTO(productProductAttribute.getProductAttribute()));
-        return dto;
-    }
-
-    default ProductAttributeDTO productAttributeToDTO(ProductAttribute productAttribute) {
-        ProductAttributeDTO dto = new ProductAttributeDTO();
-        dto.setId(productAttribute.getId());
-        dto.setName(productAttribute.getName());
-
-        if (productAttribute.getProductAttributeValues() != null && !productAttribute.getProductAttributeValues().isEmpty()) {
-            ProductAttributeValue firstValue = productAttribute.getProductAttributeValues().get(0);
-            dto.setValueId(firstValue.getAttributeValue().getId());
-            dto.setValue(firstValue.getAttributeValue().getValue());
-        }
-
-        return dto;
     }
 
     @Named("imagesToUrls")
@@ -68,5 +51,12 @@ public interface ProductMapper
         return images.stream()
                 .map(image -> "https://i.postimg.cc/" + image.getCode() + ".png")
                 .collect(Collectors.toList());
+    }
+
+    default ProductAttributeDTO productAttributeToDTO(ProductAttribute productAttribute) {
+        ProductAttributeDTO dto = new ProductAttributeDTO();
+        dto.setId(productAttribute.getId());
+        dto.setName(productAttribute.getName());
+        return dto;
     }
 }

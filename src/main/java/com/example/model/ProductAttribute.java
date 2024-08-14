@@ -22,9 +22,4 @@ public class ProductAttribute {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "productAttribute")
-    private List<ProductAttributeValue> productAttributeValues;
-
-    @OneToMany(mappedBy = "productAttribute", cascade = CascadeType.ALL)
-    private List<ProductProductAttribute> productProductAttributes;
 }

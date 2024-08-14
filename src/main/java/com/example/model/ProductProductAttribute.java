@@ -24,4 +24,7 @@ public class ProductProductAttribute
     @ManyToOne
     @JoinColumn(name = "product_attribute_id", nullable = false)
     private ProductAttribute productAttribute;
+    @ManyToOne
+    @JoinColumn(name = "attribute_value_id", nullable = false)
+    private AttributeValue attributeValue;
 }
