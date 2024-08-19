@@ -22,20 +22,30 @@ const Cart = () => {
             const cartId = localStorage.getItem('cartId');
             if (cartId) {
                 fetch(`http://localhost:8080/cart/getCartById/${cartId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        const mappedItems = data.cartEntries.map(entry => ({
-                            id: entry.id,
-                            image: entry.product.productImages[0],
-                            name: entry.product.name,
-                            sku: entry.product.sku,
-                            color: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color')?.productAttribute.value || 'Culoare indisponibilă',
-                            size: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size')?.productAttribute.value || 'Mărime indisponibilă',
-                            price: entry.pricePerPiece,
-                            quantity: entry.quantity,
-                            totalPricePerEntry: entry.totalPricePerEntry
-                        }));
-                        setCartItems(mappedItems);
+                        console.log(data);
+                        if (data.cartEntries) {
+                            const mappedItems = data.cartEntries.map(entry => ({
+                                id: entry.id,
+                                image: entry.product.productImages[0],
+                                name: entry.product.name,
+                                color: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color')?.attributeValue.value || 'Culoare indisponibilă',
+                                size: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size')?.attributeValue.value || 'Mărime indisponibilă',
+                                price: entry.pricePerPiece,
+                                quantity: entry.quantity,
+                                totalPricePerEntry: entry.totalPricePerEntry
+                            }));
+                            setCartItems(mappedItems);
+                        } else {
+                            console.error('No cart entries found');
+                            setCartItems([]); // Clear cart if no entries
+                        }
                     })
                     .catch(error => {
                         console.error('Error fetching cart:', error);
@@ -45,17 +55,47 @@ const Cart = () => {
     }, [navigate]);
 
     const handleRemoveItem = (id) => {
-        const updatedItems = cartItems.filter(item => item.id !== id);
-        setCartItems(updatedItems);
-        localStorage.setItem('cartItems', JSON.stringify(updatedItems));
+        fetch(`http://localhost:8080/cart/removeItem/${id}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (response.ok) {
+                    const updatedItems = cartItems.filter(item => item.id !== id);
+                    setCartItems(updatedItems);
+                } else {
+                    console.error('Failed to remove item from cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing item:', error);
+            });
     };
 
     const handleQuantityChange = (id, quantity) => {
-        const updatedItems = cartItems.map(item =>
-            item.id === id ? { ...item, quantity } : item
-        );
-        setCartItems(updatedItems);
-        localStorage.setItem('cartItems', JSON.stringify(updatedItems));
+        if (quantity < 1) {
+            return;
+        }
+
+        fetch(`http://localhost:8080/cart/updateQuantity/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity })
+        })
+            .then(response => {
+                if (response.ok) {
+                    const updatedItems = cartItems.map(item =>
+                        item.id === id ? { ...item, quantity } : item
+                    );
+                    setCartItems(updatedItems);
+                } else {
+                    console.error('Failed to update item quantity');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating item quantity:', error);
+            });
     };
 
     const handleApplyDiscount = () => {

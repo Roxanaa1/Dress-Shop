@@ -4,7 +4,8 @@ import '../styles/ProductDetails.css';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
-const ProductDetails = () => {
+const ProductDetails = () =>
+{
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [selectedImage, setSelectedImage] = useState('');
@@ -32,49 +33,55 @@ const ProductDetails = () => {
     const colorAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color');
     const sizeAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size');
 
-    const handleAddToCart = () =>
-    {
-        const cartId = localStorage.getItem('cartId'); // ia `cartId` din `localStorage`
+    console.log(colorAttribute);
+    console.log(sizeAttribute); 
 
-        if (!cartId) {
-            alert("Trebuie să fii logat pentru a adauga produse in cos.");
+    const handleAddToCart = () => {
+        const cartId = localStorage.getItem('cartId');
+        console.log("Cart ID:", cartId);
+
+
+        if (!cartId)
+        {
+            alert("Trebuie sa fii logat pentru a adauga produse in cos.");
             return;
         }
 
-        if (!product || !product.id) {
-            alert("Error");
+        if (!product || !product.id)
+        {
+            alert("Eroare");
             return;
         }
 
-        // construieste un obiect ProductDTO
+
         const productDTO =
             {
             id: product.id,
             name: product.name,
             price: product.price,
             availableQuantity: product.availableQuantity,
-
         };
 
-        // construieste un obiect CartEntryDTO complet
         const cartEntryDTO =
             {
             product: productDTO,
             quantity: 1,
             pricePerPiece: product.price,
-            totalPricePerEntry: product.price * 1
+            totalPricePerEntry: product.price * 1,
         };
+
+        console.log(cartEntryDTO);
 
         fetch(`http://localhost:8080/cart/addToCart/${cartId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(cartEntryDTO), // trimite CartEntryDTO complet
+            body: JSON.stringify(cartEntryDTO),
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Error');
                 }
                 return response.json();
             })
@@ -83,8 +90,8 @@ const ProductDetails = () => {
                 alert('Produsul a fost adaugat in cosul de cumparaturi!');
             })
             .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                alert('Error');
+                console.error('Eroare:', error);
+                alert('Eroare');
             });
     };
 
@@ -119,13 +126,13 @@ const ProductDetails = () => {
                         {colorAttribute && (
                             <div className="colors">
                                 <span>Color:</span>
-                                <span className="color-sample" style={{ backgroundColor: colorAttribute.productAttribute.value }}></span>
+                                <span className="color-sample" style={{ backgroundColor: colorAttribute.attributeValue.value }}></span>
                             </div>
                         )}
                         {sizeAttribute && (
                             <div className="sizes">
                                 <span>Size:</span>
-                                <button className="size-button">{sizeAttribute.productAttribute.value}</button>
+                                <button className="size-button">{sizeAttribute.attributeValue.value}</button>
                             </div>
                         )}
                     </div>
