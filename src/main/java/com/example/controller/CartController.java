@@ -49,7 +49,8 @@ public class CartController
     @PostMapping("/addToCart/{cartId}")
     public ResponseEntity<CartDTO> addToCart(@PathVariable int cartId, @RequestBody CartEntryDTO cartEntryDTO)
     {
-        if (cartEntryDTO == null || cartEntryDTO.getProduct() == null) {
+        if (cartEntryDTO == null || cartEntryDTO.getProduct() == null)
+        {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 

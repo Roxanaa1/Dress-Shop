@@ -39,7 +39,8 @@ public class CartService
     }
 
     @Transactional
-    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO) {
+    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO)
+    {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -58,12 +59,15 @@ public class CartService
         if (existingEntry != null) {
             existingEntry.setQuantity(existingEntry.getQuantity() + cartEntryDTO.getQuantity());
             existingEntry.setTotalPricePerEntry(existingEntry.getQuantity() * existingEntry.getPricePerPiece());
+
         } else {
             CartEntry newEntry = cartMapper.cartEntryDTOToCartEntry(cartEntryDTO);
             newEntry.setProduct(product);
             newEntry.setCart(cart);
             newEntry.setTotalPricePerEntry(newEntry.getQuantity() * newEntry.getPricePerPiece());
             cart.getCartEntries().add(newEntry);
+            cartEntryRepository.save(newEntry);
+
         }
 
         product.setAvailableQuantity(product.getAvailableQuantity() - cartEntryDTO.getQuantity());

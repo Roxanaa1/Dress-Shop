@@ -21,7 +21,7 @@ public class CartEntry
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -29,9 +29,11 @@ public class CartEntry
     private int quantity;
 
     @Column(name = "priceperpiece",nullable = false)
-    private float PricePerPiece;
+    private float pricePerPiece;
 
     @Column(name = "totalpriceperentry",nullable = false)
     private float totalPricePerEntry;
+
+
 
 }
