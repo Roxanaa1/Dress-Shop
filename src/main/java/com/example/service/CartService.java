@@ -39,41 +39,52 @@ public class CartService
     }
 
     @Transactional
-    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO)
-    {
+    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        CartEntry cartEntry = cartMapper.cartEntryDTOToCartEntry(cartEntryDTO);
 
         Product product = productRepository.findById(cartEntryDTO.getProduct().getId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // utilizeaza ProductMapper pt a converti Product în ProductDTO
-        ProductDTO productDTO = productMapper.productToProductDTO(product);
-
-        if (product.getAvailableQuantity() < cartEntryDTO.getQuantity())
-        {
-            throw new RuntimeException("Insufficient quantity available");
+        if (product.getAvailableQuantity() < cartEntryDTO.getQuantity()) {
+            throw new RuntimeException("Not enough product quantity available.");
         }
 
-        cartEntry.setProduct(product);
-        cartEntry.setCart(cart);
+        CartEntry existingEntry = cart.getCartEntries().stream()
+                .filter(entry -> entry.getProduct().getId() == product.getId())
+                .findFirst()
+                .orElse(null);
 
-        float totalPricePerEntry = cartEntryDTO.getQuantity() * cartEntryDTO.getPricePerPiece();
-        cartEntry.setTotalPricePerEntry(totalPricePerEntry);
+        if (existingEntry != null) {
+            existingEntry.setQuantity(existingEntry.getQuantity() + cartEntryDTO.getQuantity());
+            existingEntry.setTotalPricePerEntry(existingEntry.getQuantity() * existingEntry.getPricePerPiece());
+        } else {
+            CartEntry newEntry = cartMapper.cartEntryDTOToCartEntry(cartEntryDTO);
+            newEntry.setProduct(product);
+            newEntry.setCart(cart);
+            newEntry.setTotalPricePerEntry(newEntry.getQuantity() * newEntry.getPricePerPiece());
+            cart.getCartEntries().add(newEntry);
+        }
 
         product.setAvailableQuantity(product.getAvailableQuantity() - cartEntryDTO.getQuantity());
 
-        cart.getCartEntries().add(cartEntry);
-
-        float updatedTotalPrice = cart.getTotalPrice() + totalPricePerEntry;
+        float updatedTotalPrice = cart.getCartEntries().stream()
+                .map(CartEntry::getTotalPricePerEntry)
+                .reduce(0f, Float::sum);
         cart.setTotalPrice(updatedTotalPrice);
 
         Cart updatedCart = cartRepository.save(cart);
 
+        productRepository.save(product);
         return cartMapper.cartToCartDTO(updatedCart);
     }
+
+
+    public void removeItem(int itemId)
+    {
+        cartEntryRepository.deleteById(itemId);
+    }
+
     public List<CartDTO> getAllCarts()
     {
         List<Cart> carts = cartRepository.findAll();
@@ -107,4 +118,5 @@ public class CartService
     {
         cartRepository.deleteById(id);
     }
+
 }
