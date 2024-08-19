@@ -7,11 +7,19 @@ const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [discountCode, setDiscountCode] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [deliveryDetails, setDeliveryDetails] = useState({
+        firstName: '',
+        lastName: '',
+        phone: '',
+        county: '',
+        city: '',
+        address: '',
+    });
+    const [paymentMethod, setPaymentMethod] = useState('ramburs');
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    useEffect(() =>
-    {
+    useEffect(() => {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         setIsLoggedIn(loggedIn);
 
@@ -29,7 +37,6 @@ const Cart = () => {
                         return response.json();
                     })
                     .then(data => {
-                        console.log(data);
                         if (data.cartEntries) {
                             const mappedItems = data.cartEntries.map(entry => ({
                                 id: entry.id,
@@ -43,8 +50,7 @@ const Cart = () => {
                             }));
                             setCartItems(mappedItems);
                         } else {
-                            console.error('No cart entries found');
-                            setCartItems([]); // Clear cart if no entries
+                            setCartItems([]);
                         }
                     })
                     .catch(error => {
@@ -106,6 +112,18 @@ const Cart = () => {
         }
     };
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setDeliveryDetails(prevDetails => ({
+            ...prevDetails,
+            [name]: value,
+        }));
+    };
+
+    const handlePaymentChange = (e) => {
+        setPaymentMethod(e.target.value);
+    };
+
     const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const shippingCost = 15;
     const total = subtotal - (subtotal * discount) + shippingCost;
@@ -129,7 +147,7 @@ const Cart = () => {
                     ) : (
                         cartItems.map(item => (
                             <div className="cart-item" key={item.id}>
-                                <img src={item.image} alt={item.name} />
+                                <img src={item.image} alt={item.name}/>
                                 <div className="item-details">
                                     <h2>{item.name}</h2>
                                     <p>Culoare: {item.color}</p>
@@ -143,43 +161,115 @@ const Cart = () => {
                                             onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
                                         />
                                     </div>
-                                    <button onClick={() => handleRemoveItem(item.id)} className="remove-button">Șterge</button>
+                                    <button onClick={() => handleRemoveItem(item.id)} className="remove-button">Șterge
+                                    </button>
                                 </div>
                             </div>
                         ))
                     )}
                 </div>
-                <div className="cart-summary">
-                    <div className="discount">
+
+            </div>
+
+
+            <div className="delivery-payment-container">
+                <div className="delivery-details">
+                    <h3>Date de Livrare</h3>
+                    <div className="form-group">
+                        <label>Prenume:</label>
                         <input
                             type="text"
-                            placeholder="Ai un cod de reducere?"
-                            value={discountCode}
-                            onChange={(e) => setDiscountCode(e.target.value)}
+                            name="firstName"
+                            value={deliveryDetails.firstName}
+                            onChange={handleInputChange}
                         />
-                        <button onClick={handleApplyDiscount}>Aplică Reducerea</button>
                     </div>
-                    <div className="summary-details">
-                        <p>Valoare comandă: {subtotal.toFixed(2)} Lei</p>
-                        <p>Livrare: {shippingCost === 0 ? 'GRATUIT' : `${shippingCost} Lei`}</p>
-                        {discount > 0 && <p>Discount: {discount * 100}%</p>}
-                        <p><strong>Total: {total.toFixed(2)} Lei</strong></p>
-                        <button onClick={handleCheckout} className="checkout-button">Continuă la pagina de finalizare a comenzii</button>
+                    <div className="form-group">
+                        <label>Nume:</label>
+                        <input
+                            type="text"
+                            name="lastName"
+                            value={deliveryDetails.lastName}
+                            onChange={handleInputChange}
+                        />
                     </div>
-                    <div className="payment-info">
-                        <p>Acceptăm</p>
-                        <div className="payment-icons">
-                            <i className="fab fa-cc-maestro"></i>
-                            <i className="fab fa-cc-mastercard"></i>
-                            <i className="fab fa-cc-visa"></i>
-                            <i className="fas fa-gift"></i>
+                    <div className="form-group">
+                        <label>Telefon:</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            value={deliveryDetails.phone}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Județ:</label>
+                        <input
+                            type="text"
+                            name="county"
+                            value={deliveryDetails.county}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Localitate:</label>
+                        <input
+                            type="text"
+                            name="city"
+                            value={deliveryDetails.city}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Adresă:</label>
+                        <input
+                            type="text"
+                            name="address"
+                            value={deliveryDetails.address}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <div className="payment-summary-container">
+                    <div className="payment-method">
+                        <h3>Metoda de Plată</h3>
+                        <label>
+                            <input
+                                type="radio"
+                                value="ramburs"
+                                checked={paymentMethod === 'ramburs'}
+                                onChange={handlePaymentChange}
+                            />
+                            Plata la livrare (Ramburs)
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                value="online"
+                                checked={paymentMethod === 'online'}
+                                onChange={handlePaymentChange}
+                            />
+                            Plata online (Mobilpay)
+                        </label>
+                    </div>
+                    <div className="cart-summary">
+                        <div className="discount">
+                            <input
+                                type="text"
+                                placeholder="Ai un cod de reducere?"
+                                value={discountCode}
+                                onChange={(e) => setDiscountCode(e.target.value)}
+                            />
+                            <button onClick={handleApplyDiscount}>Aplică Reducerea</button>
                         </div>
-                        <p className="additional-info">
-                            Prețurile și costurile de livrare nu sunt confirmate până când nu ajungeți la pagina de finalizare a comenzii.
-                        </p>
-                        <p className="return-policy">
-                            Detalii despre returnare în 30 zile și politica de anulare a comenzii. <a href="#">returnare și rambursare</a>.
-                        </p>
+                        <div className="summary-details">
+                            <p>Valoare comandă: {subtotal.toFixed(2)} Lei</p>
+                            <p>Livrare: {shippingCost === 0 ? 'GRATUIT' : `${shippingCost} Lei`}</p>
+                            {discount > 0 && <p>Discount: {discount * 100}%</p>}
+                            <p><strong>Total: {total.toFixed(2)} Lei</strong></p>
+                        </div>
+                        <button onClick={handleCheckout} className="checkout-button">Trimite Comanda</button>
                     </div>
                 </div>
             </div>
