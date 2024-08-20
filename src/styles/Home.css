@@ -5,9 +5,12 @@ body, html {
     height: 100%;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
-    background-color: #f9f9f9;
+    background-color: #F8EDE3;
 }
-
+h1 {
+    font-family: 'Mate', serif;
+    color: #A7727D;
+}
 .Home {
     text-align: center;
     min-height: 100vh;
@@ -19,14 +22,14 @@ main {
     flex-grow: 1;
     padding: 20px;
     margin-top: -5px;
-    margin-left: 120px;
+    background-color: #F8EDE3;
 }
 
 .image-gallery {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
-    gap: 20px;
+    gap: 30px;
     margin: 0 auto;
     max-width: 1200px;
     padding-bottom: 20px;
@@ -55,12 +58,12 @@ main {
 
 .dress-name {
     font-size: 16px;
-    color: #333;
+    color: #A7727D;
     margin-top: -3px;
 }
 
 .dress-price {
     font-size: 14px;
-    color: #888;
+    color: #A7727D;
     margin-bottom: 10px;
 }

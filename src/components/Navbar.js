@@ -53,6 +53,9 @@ const Navbar = () => {
         <header className="navbar">
             <div className="navbar-left">
                 <div className="navbar-brand" onClick={() => navigate('/')}></div>
+                <button onClick={() => navigate('/dresses/all')}>DRESSES</button>
+                <button onClick={() => navigate('/dresses/EVENING%20DRESSES')}>EVENING DRESSES</button>
+                <button onClick={() => navigate('/dresses/DAY%20DRESSES')}>DAY DRESSES</button>
             </div>
             <div className="navbar-icons">
                 <a onClick={toggleDropdown} aria-label="Profile">
@@ -70,11 +73,11 @@ const Navbar = () => {
                         )}
                     </div>
                 )}
-                <a href="#wishlist" aria-label="Wishlist">
-                    <i className="fas fa-heart"></i>
-                </a>
                 <a onClick={handleCartRedirect} aria-label="Cart">
                     <i className="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#wishlist" aria-label="Wishlist">
+                    <i className="fas fa-heart"></i>
                 </a>
                 <a href="#search" aria-label="Search">
                     <i className="fas fa-search"></i>

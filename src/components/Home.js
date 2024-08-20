@@ -32,7 +32,7 @@ const Home = () => {
     return (
         <div className="Home">
             <main className="main-content">
-                <h1>Colectia de Rochii</h1>
+                <h1>DRESS COLLECTION</h1>
                 {error && <p className="error">{error}</p>}
                 <div className="image-gallery">
                     {dresses.map((dress) => (

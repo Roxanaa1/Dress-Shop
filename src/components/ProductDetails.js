@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/ProductDetails.css';
 import Navbar from './Navbar';
-import Sidebar from './Sidebar';
 
 const ProductDetails = () =>
 {
@@ -99,7 +98,6 @@ const ProductDetails = () =>
     return (
         <div className="ProductDetails">
             <Navbar />
-            <Sidebar />
             <div className="details-container">
                 <div className="image-gallery">
                     {selectedImage && <img src={selectedImage} alt={product.name} className="main-image" />}

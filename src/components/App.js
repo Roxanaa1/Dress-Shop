@@ -5,17 +5,15 @@ import Register from './Register';
 import Login from './Login';
 import ProductDetails from './ProductDetails';
 import Navbar from './Navbar';
-import Sidebar from './Sidebar';
 import Cart from './Cart';
 
 const AppContent = () => {
     const location = useLocation();
-    const showSidebarAndNavbar = !['/login', '/register'].includes(location.pathname);
+    const showNavbar = !['/login', '/register'].includes(location.pathname);
 
     return (
         <div className="App">
-            {showSidebarAndNavbar && <Navbar />}
-            {showSidebarAndNavbar && <Sidebar />}
+            {showNavbar && <Navbar />}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/register" element={<Register />} />

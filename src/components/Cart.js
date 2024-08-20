@@ -24,7 +24,7 @@ const Cart = () => {
         setIsLoggedIn(loggedIn);
 
         if (!loggedIn) {
-            alert("Trebuie să fii logat pentru a accesa cosul de cumparaturi.");
+            alert("Trebuie sa fii logat pentru a accesa cosul de cumparaturi.");
             navigate('/login');
         } else {
             const cartId = localStorage.getItem('cartId');
@@ -134,7 +134,7 @@ const Cart = () => {
 
     return (
         <div className="cart-page">
-            <h1>Shopping Cart</h1>
+            <h1>SHOPPING CART</h1>
             <div className="top-info">
                 <div className="info-item">• Special shipping price: 15 lei</div>
                 <div className="info-item">• 14-day return period</div>
@@ -150,9 +150,9 @@ const Cart = () => {
                                 <img src={item.image} alt={item.name}/>
                                 <div className="item-details">
                                     <h2>{item.name}</h2>
-                                    <p>Culoare: {item.color}</p>
-                                    <p>Mărime: {item.size}</p>
-                                    <p>Preț: {item.price} Lei</p>
+                                    <p>Color: {item.color}</p>
+                                    <p>Size: {item.size}</p>
+                                    <p>Price: {item.price} Lei</p>
                                     <div className="quantity-container">
                                         <input
                                             type="number"
@@ -174,9 +174,9 @@ const Cart = () => {
 
             <div className="delivery-payment-container">
                 <div className="delivery-details">
-                    <h3>Date de Livrare</h3>
+                    <h3>Delivery details</h3>
                     <div className="form-group">
-                        <label>Prenume:</label>
+                        <label>First name:</label>
                         <input
                             type="text"
                             name="firstName"
@@ -185,7 +185,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Nume:</label>
+                        <label>Last name:</label>
                         <input
                             type="text"
                             name="lastName"
@@ -194,7 +194,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Telefon:</label>
+                        <label>Phone number:</label>
                         <input
                             type="text"
                             name="phone"
@@ -203,7 +203,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Județ:</label>
+                        <label>County:</label>
                         <input
                             type="text"
                             name="county"
@@ -212,7 +212,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Localitate:</label>
+                        <label>City:</label>
                         <input
                             type="text"
                             name="city"
@@ -221,7 +221,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Adresă:</label>
+                        <label>Address:</label>
                         <input
                             type="text"
                             name="address"
@@ -233,7 +233,7 @@ const Cart = () => {
 
                 <div className="payment-summary-container">
                     <div className="payment-method">
-                        <h3>Metoda de Plată</h3>
+                        <h3>Payment method</h3>
                         <label>
                             <input
                                 type="radio"
@@ -250,7 +250,7 @@ const Cart = () => {
                                 checked={paymentMethod === 'online'}
                                 onChange={handlePaymentChange}
                             />
-                            Plata online (Mobilpay)
+                            Plata online
                         </label>
                     </div>
                     <div className="cart-summary">
