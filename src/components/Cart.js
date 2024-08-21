@@ -14,6 +14,8 @@ const Cart = () => {
         county: '',
         city: '',
         address: '',
+        streetLine: '',
+        postalCode: ''
     });
     const [paymentMethod, setPaymentMethod] = useState('ramburs');
     const navigate = useNavigate();
@@ -176,7 +178,7 @@ const Cart = () => {
                 <div className="delivery-details">
                     <h3>Delivery details</h3>
                     <div className="form-group">
-                        <label>First name:</label>
+                        <label>First Name:</label>
                         <input
                             type="text"
                             name="firstName"
@@ -185,7 +187,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Last name:</label>
+                        <label>Last Name:</label>
                         <input
                             type="text"
                             name="lastName"
@@ -194,7 +196,7 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Phone number:</label>
+                        <label>Phone Number:</label>
                         <input
                             type="text"
                             name="phone"
@@ -229,6 +231,25 @@ const Cart = () => {
                             onChange={handleInputChange}
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Street Line:</label>
+                        <input
+                            type="text"
+                            name="streetLine"
+                            value={deliveryDetails.streetLine}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Postal Code:</label>
+                        <input
+                            type="text"
+                            name="postalCode"
+                            value={deliveryDetails.postalCode}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+
                 </div>
 
                 <div className="payment-summary-container">
