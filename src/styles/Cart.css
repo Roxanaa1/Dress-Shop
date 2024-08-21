@@ -273,3 +273,20 @@ h1 {
     background-color: #f9f9f9;
     font-size: 14px;
 }
+
+.save-delivery-button {
+    background-color: #A7727D;
+    color: white;
+    width: 120px;
+    margin-left: 300px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+.save-delivery-button:hover {
+    background-color: #A7727D;
+}
+

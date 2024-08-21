@@ -11,6 +11,7 @@ const Cart = () => {
         firstName: '',
         lastName: '',
         phone: '',
+        country: '',
         county: '',
         city: '',
         address: '',
@@ -78,6 +79,34 @@ const Cart = () => {
                 console.error('Error removing item:', error);
             });
     };
+    const handleSaveDeliveryDetails = () => {
+        const userId = localStorage.getItem('userId');
+
+        fetch(`http://localhost:8080/users/addresses/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deliveryDetails)
+        })
+            .then(response => {
+                console.log('Response from server:', response);
+                if (!response.ok) {
+                    throw new Error('Failed to save delivery details');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Server returned data:', data);
+                alert('Delivery details saved successfully!');
+            })
+            .catch(error => {
+                console.error('Error saving delivery details:', error);
+                alert('Failed to save delivery details');
+            });
+    };
+
+
 
     const handleQuantityChange = (id, quantity) => {
         if (quantity < 1) {
@@ -205,6 +234,16 @@ const Cart = () => {
                         />
                     </div>
                     <div className="form-group">
+                        <label>Country:</label>
+                        <input
+                            type="text"
+                            name="country"
+                            value={deliveryDetails.country}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+
+                    <div className="form-group">
                         <label>County:</label>
                         <input
                             type="text"
@@ -249,6 +288,10 @@ const Cart = () => {
                             onChange={handleInputChange}
                         />
                     </div>
+                    <button onClick={handleSaveDeliveryDetails} className="save-delivery-button">
+                        Save
+                    </button>
+
 
                 </div>
 
@@ -256,7 +299,7 @@ const Cart = () => {
                     <div className="payment-method">
                         <h3>Payment method</h3>
                         <label>
-                            <input
+                        <input
                                 type="radio"
                                 value="ramburs"
                                 checked={paymentMethod === 'ramburs'}

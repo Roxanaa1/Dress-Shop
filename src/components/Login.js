@@ -39,9 +39,10 @@ function Login() {
                 throw new Error(data.message || 'Login failed.');
             }
 
-            // Stocare cartId și isLoggedIn în localStorage
+            console.log('Login response data:', data);
+            localStorage.setItem('userId', data.userId);
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('cartId', data.cartId); // Presupunând că backend-ul returnează un cartId
+            localStorage.setItem('cartId', data.cartId);
 
             console.log('Login successful:', data);
             setSuccess(data.message);
@@ -52,6 +53,7 @@ function Login() {
             setSuccess(null);
         }
     };
+
 
     const handleRegisterRedirect = () => {
         navigate('/register');
