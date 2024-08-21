@@ -106,4 +106,16 @@ public class ProductController
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
+
+    @PostMapping("/addToWishlist/{userId}/{productId}")
+    public ResponseEntity<?> addToWishlist(@PathVariable int userId, @PathVariable int productId)
+    {
+        try {
+            wishlistService.addToWishlist(userId, productId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
