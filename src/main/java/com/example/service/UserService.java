@@ -1,11 +1,17 @@
 package com.example.service;
 
+import com.example.mapper.AddressMapper;
+import com.example.model.Address;
 import com.example.model.User;
+import com.example.model.dtos.AddressDTO;
+import com.example.repository.AddressRepository;
 import com.example.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 @Service
@@ -13,11 +19,15 @@ public class UserService
 {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressMapper addressMapper;
+    private final AddressRepository addressRepository;
     @Autowired
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder)
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository)
     {
         this.userRepository=userRepository;
         this.passwordEncoder=passwordEncoder;
+        this.addressMapper=addressMapper;
+        this.addressRepository=addressRepository;
     }
 
     public User createUser(User user)
@@ -72,6 +82,19 @@ public class UserService
 
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
+    }
+
+
+    @Transactional
+    public AddressDTO addAddressToUser(AddressDTO addressDTO, int userId)
+    {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
+
+        Address address = addressMapper.addressDTOToAddress(addressDTO);
+        address.setUser(user);
+        address = addressRepository.save(address);
+        return addressMapper.addressToAddressDTO(address);
     }
 
 

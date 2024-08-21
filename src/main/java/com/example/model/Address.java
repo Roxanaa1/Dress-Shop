@@ -27,9 +27,11 @@ public class Address
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "county")
+    @Column(name = "county",nullable = false)
     private String county;
 
     @Column(name = "country",nullable = false)
     private String country;
+    @ManyToOne
+    private User user;
 }

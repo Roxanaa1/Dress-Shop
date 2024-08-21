@@ -1,8 +1,10 @@
 package com.example.controller;
 
+import com.example.model.dtos.AddressDTO;
 import com.example.model.dtos.CartDTO;
 import com.example.model.dtos.CartEntryDTO;
 import com.example.service.CartService;
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,12 @@ public class CartController
 
 
     private final CartService cartService;
+    private final UserService userService;
     @Autowired
-    public CartController(CartService cartService)
+    public CartController(CartService cartService,UserService userService)
     {
         this.cartService=cartService;
+        this.userService=userService;
     }
 
     @GetMapping("/getAllCarts")
@@ -88,4 +92,6 @@ public class CartController
         cartService.deleteCart(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }
