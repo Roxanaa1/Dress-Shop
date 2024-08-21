@@ -94,10 +94,22 @@ public class UserService
         Address address = addressMapper.addressDTOToAddress(addressDTO);
         address.setUser(user);
         address = addressRepository.save(address);
+
+        if (user.getDefaultBillingAddress() == 0 ) {
+            user.setDefaultBillingAddress(address.getId());
+        } else {
+            user.setDefaultBillingAddress(address.getId());
+        }
+
+        if ( user.getDefaultDeliveryAddress() == 0) {
+            user.setDefaultDeliveryAddress(address.getId());
+        } else {
+            user.setDefaultDeliveryAddress(address.getId());
+        }
+
+        userRepository.save(user);
+
         return addressMapper.addressToAddressDTO(address);
     }
-
-
-
 
 }

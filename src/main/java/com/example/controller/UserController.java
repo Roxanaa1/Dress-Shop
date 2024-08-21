@@ -9,8 +9,6 @@ import com.example.model.dtos.UserDTO;
 import com.example.repository.CartRepository;
 import com.example.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +29,6 @@ public class UserController
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
 
     @Autowired
     public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder,CartRepository cartRepository)
@@ -64,70 +60,53 @@ public class UserController
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDTO loginUser)
     {
-        System.out.println("Login request received for email: " + loginUser.getEmail());
-
         Optional<User> userOptional = userService.findUserByEmail(loginUser.getEmail());
 
         if (userOptional.isPresent())
         {
             User user = userOptional.get();
-            System.out.println("User found: " + user.getEmail());
 
             if (passwordEncoder.matches(loginUser.getPassword(), user.getPassword()))
             {
-                System.out.println("Password matches for user: " + user.getEmail());
-
                 if (user.getCart() == null)
                 {
-                    System.out.println("User has no cart, creating new cart...");
                     Cart newCart = new Cart();
                     newCart.setUser(user);
                     Cart savedCart = cartRepository.save(newCart);
                     user.setCart(savedCart);
                     userService.updateUser(user, user.getId());
-                    System.out.println("New cart created and assigned to user: " + savedCart.getId());
                 }
 
                 UserDTO userDTO = userMapper.userToUserDTO(user);
-                System.out.println("UserDTO created: " + userDTO);
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("userId", user.getId());
                 response.put("cartId", userDTO.getCartId());
                 response.put("message", "Login successful");
 
-                System.out.println("Login successful, sending response: " + response);
-
                 return ResponseEntity.ok(response);
-            } else {
-                System.out.println("Invalid password for user: " + user.getEmail());
+            } else
+            {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Invalid password!"));
             }
         } else {
-            System.out.println("User does not exist for email: " + loginUser.getEmail());
             return ResponseEntity.badRequest().body(new MessageResponse("User does not exist!"));
         }
     }
 
-
     @PostMapping("/addresses/{userId}")
     public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO, @PathVariable int userId)
     {
-        logger.info("Received request to add address for userId: {}", userId);
-        logger.debug("Address details: {}", addressDTO);
-
         if (userId == 0)
         {
-            logger.error("Invalid user ID: {}", userId);
             throw new RuntimeException("Invalid user ID");
         }
 
         try {
             AddressDTO savedAddress = userService.addAddressToUser(addressDTO, userId);
-            logger.info("Successfully saved address for userId: {}", userId);
             return ResponseEntity.ok(savedAddress);
-        } catch (Exception e) {
-            logger.error("Error occurred while saving address for userId: {}", userId, e);
+        } catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -176,7 +155,4 @@ public class UserController
             return ResponseEntity.notFound().build();
         }
     }
-
-
-
 }
