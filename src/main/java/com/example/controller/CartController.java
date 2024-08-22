@@ -97,14 +97,5 @@ public class CartController
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam("query") String query)
-    {
-        List<Product> products = productService.searchProducts(query);
-        List<ProductDTO> productDTOs = products.stream()
-                .map(productMapper::productToProductDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDTOs);
-    }
 
 }

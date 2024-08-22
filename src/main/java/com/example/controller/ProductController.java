@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -31,6 +30,19 @@ public class ProductController
     }
 
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String query)
+    {
+        List<Product> products = productService.searchProducts(query);
+        if (products.isEmpty())
+        {
+            return ResponseEntity.noContent().build();
+        }
+        List<ProductDTO> productDTOs = products.stream()
+                .map(productMapper::productToProductDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
+    }
     @PostMapping("/addProduct")
     public ResponseEntity<ProductDTO> addProduct(@RequestBody ProductDTO productDTO)
     {
@@ -106,4 +118,5 @@ public class ProductController
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
+
 }
