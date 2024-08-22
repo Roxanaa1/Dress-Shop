@@ -48,4 +48,8 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImages;
+
+    @OneToMany(mappedBy = "product")
+    private List<Wishlist> wishlistEntries;
+
 }

@@ -2,17 +2,12 @@ package com.example.service;
 
 import com.example.mapper.ProductMapper;
 import com.example.model.Product;
-import com.example.model.dtos.ProductDTO;
 import com.example.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 public class ProductService
 {
@@ -83,9 +78,12 @@ public class ProductService
 
     public List<Product> getProductsByCategory(String category)
     {
-        System.out.println("Category received: " + category); // Log pentru a verifica categoria
         List<Product> products = productRepository.findByCategoryNameIgnoreCase(category);
-        System.out.println("Products found: " + products.size()); // Log pentru a verifica numărul de produse găsite
         return products;
+    }
+
+    public List<Product> searchProducts(String query)
+    {
+        return productRepository.findByNameContainingIgnoreCase(query);
     }
 }

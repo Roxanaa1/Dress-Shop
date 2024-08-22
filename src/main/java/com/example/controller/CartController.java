@@ -1,9 +1,12 @@
 package com.example.controller;
 
-import com.example.model.dtos.AddressDTO;
+import com.example.mapper.ProductMapper;
+import com.example.model.Product;
 import com.example.model.dtos.CartDTO;
 import com.example.model.dtos.CartEntryDTO;
+import com.example.model.dtos.ProductDTO;
 import com.example.service.CartService;
+import com.example.service.ProductService;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,21 +15,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/cart")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CartController
 {
-
-
     private final CartService cartService;
     private final UserService userService;
+    private final ProductService productService;
+    private final ProductMapper productMapper;
     @Autowired
-    public CartController(CartService cartService,UserService userService)
+    public CartController(CartService cartService,UserService userService,ProductService productService,ProductMapper productMapper)
     {
         this.cartService=cartService;
         this.userService=userService;
+        this.productService=productService;
+        this.productMapper=productMapper;
     }
 
     @GetMapping("/getAllCarts")
@@ -77,8 +83,6 @@ public class CartController
         }
     }
 
-
-
     @PutMapping("/updateCart/{id}")
     public ResponseEntity<CartDTO> updateCart(@PathVariable int id, @RequestBody CartDTO cartDTO)
     {
@@ -93,5 +97,14 @@ public class CartController
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam("query") String query)
+    {
+        List<Product> products = productService.searchProducts(query);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(productMapper::productToProductDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
+    }
 
 }

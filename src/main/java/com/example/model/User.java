@@ -48,4 +48,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Address> addresses;
 
+    @OneToMany(mappedBy = "user")
+    private List<Wishlist> wishlistEntries;
+
+
+    public User(int id) {
+        this.id = id;
+    }
 }
