@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-const Navbar = () => {
+const Navbar = ({ onSearchClick }) => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -44,7 +44,7 @@ const Navbar = () => {
         if (isLoggedIn) {
             navigate('/cart');
         } else {
-            alert("Trebuie să fii logat pentru a accesa cosul de cumparaturi.");
+            alert("Trebuie sa fii logat pentru a accesa cosul de cumparaturi.");
             navigate('/login');
         }
     };
@@ -76,10 +76,10 @@ const Navbar = () => {
                 <a onClick={handleCartRedirect} aria-label="Cart">
                     <i className="fas fa-shopping-cart"></i>
                 </a>
-                <a href="#wishlist" aria-label="Wishlist">
+                <a onClick={() => navigate('/wishlist')} aria-label="Wishlist">
                     <i className="fas fa-heart"></i>
                 </a>
-                <a href="#search" aria-label="Search">
+                <a onClick={onSearchClick} aria-label="Search">
                     <i className="fas fa-search"></i>
                 </a>
                 <a href="#menu" aria-label="Menu">

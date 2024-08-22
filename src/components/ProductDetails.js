@@ -94,6 +94,34 @@ const ProductDetails = () =>
             });
     };
 
+    const handleAddToWishlist = () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert("Trebuie sa fii logat pentru a adauga produse in wishlist.");
+            return;
+        }
+
+        fetch(`http://localhost:8080/wishlist/add/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId: product.id }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Produsul a fost adaugat in wishlist!');
+            })
+            .catch(error => {
+                console.error('Eroare:', error);
+                alert('Eroare');
+            });
+    };
 
     return (
         <div className="ProductDetails">
@@ -137,7 +165,7 @@ const ProductDetails = () =>
                     <button className="add-to-cart" onClick={handleAddToCart} disabled={product.availableQuantity === 0}>
                         Add to cart
                     </button>
-                    <button className="wishlist">Save to Wishlist</button>
+                    <button className="wishlist" onClick={handleAddToWishlist}>Save to Wishlist</button>
                 </div>
             </div>
         </div>

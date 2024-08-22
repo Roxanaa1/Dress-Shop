@@ -6,6 +6,7 @@ import Login from './Login';
 import ProductDetails from './ProductDetails';
 import Navbar from './Navbar';
 import Cart from './Cart';
+import Wishlist from './Wishlist';
 
 const AppContent = () => {
     const location = useLocation();
@@ -19,9 +20,10 @@ const AppContent = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/ProductDetails/:id" element={<ProductDetails />} />
-                <Route path="/dresses/:filter" element={<Home />} />
+                <Route path="/dresses/:filter" element={<Home />} />8
                 <Route path="/cart" element={<Cart />} />
-                <Route path="*" element={<div>Pagina nu a fost găsită</div>} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
             </Routes>
         </div>
     );
