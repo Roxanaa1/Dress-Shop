@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import '../styles/Home.css';
 
 const Home = () => {
     const [dresses, setDresses] = useState([]);
     const [error, setError] = useState('');
-    const [showSearchBar, setShowSearchBar] = useState(false); // State pt a controla vizibilitatea barei search
-    const [searchTerm, setSearchTerm] = useState(''); // State pt a retine termenul de cautare
-    const { filter } = useParams();
+    const [searchParams] = useSearchParams();
+    const filter = searchParams.get('filter') || 'all';
+    const searchText = searchParams.get('text') || '';
 
-    useEffect(() =>
-    {
-        const url = filter === 'all' || !filter
-            ? 'http://localhost:8080/products/getAllProducts'
-            : `http://localhost:8080/products/getProductsByCategory?category=${filter}`;
+    useEffect(() => {
+        const url = searchText
+            ? `http://localhost:8080/products/search?query=${searchText}`
+            : filter === 'all'
+                ? 'http://localhost:8080/products/getAllProducts'
+                : `http://localhost:8080/products/getProductsByCategory?category=${filter}`;
 
         fetch(url)
             .then(response => {
@@ -23,52 +24,21 @@ const Home = () => {
                 }
                 return response.json();
             })
-            .then(data =>
-            {
+            .then(data => {
                 setDresses(data);
             })
             .catch(error => {
                 setError('Failed to load dresses');
+                console.error('Error loading dresses:', error);
             });
-    }, [filter]);
+    }, [filter, searchText]);
 
-    const handleSearchClick = () => {
-        setShowSearchBar(!showSearchBar); // Toggle pt a afisa/ascunde bara de cautare
-    };
-
-    const handleSearch = () => {
-        if (searchTerm.trim() !== '') {
-            fetch(`http://localhost:8080/cart/search?query=${searchTerm}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    setDresses(data);
-                })
-                .catch(error => {
-                    setError('Failed to fetch search results');
-                });
-        }
-    };
     return (
         <div className="Home">
-            <Navbar onSearchClick={handleSearchClick} />
+            <Navbar />
             <main className="main-content">
                 <h1>DRESS COLLECTION</h1>
-                {showSearchBar && ( // bara de cautare vizibila doar daca showSearchBar este true
-                    <div className="search-bar">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <button onClick={handleSearch}>Search</button>
-                    </div>
-                )}
+
                 {error && <p className="error">{error}</p>}
                 <div className="image-gallery">
                     {dresses.map((dress) => (

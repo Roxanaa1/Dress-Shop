@@ -1,0 +1,39 @@
+.wishlist-container {
+    font-family: 'Mate', serif;
+    color: #A7727D;
+    justify-content: center;
+    align-items: center;
+    margin-top: 70px;
+}
+
+.wishlist-item {
+    position: relative;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    width: 400px;
+}
+
+.wishlist-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+
+}
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 10px;
+    margin-left: 100px;
+    grid-row-gap: 20px;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    margin-top: 20px;
+}

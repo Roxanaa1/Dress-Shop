@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-const Navbar = ({ onSearchClick }) => {
+const Navbar = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const checkAuthStatus = () => {
@@ -21,31 +21,19 @@ const Navbar = ({ onSearchClick }) => {
         };
     }, []);
 
-    const toggleDropdown = () => {
-        setShowDropdown(!showDropdown);
-    };
-
     const handleLoginRedirect = () => {
         navigate('/login');
-    };
-
-    const handleRegister = () => {
-        navigate('/register');
     };
 
     const handleLogout = () => {
         localStorage.removeItem('isLoggedIn');
         setIsLoggedIn(false);
-        setShowDropdown(false);
         navigate('/');
     };
 
-    const handleCartRedirect = () => {
-        if (isLoggedIn) {
-            navigate('/cart');
-        } else {
-            alert("Trebuie sa fii logat pentru a accesa cosul de cumparaturi.");
-            navigate('/login');
+    const navitateToSearch = () => {
+        if (searchTerm.trim() !== '') {
+            navigate(`/search?text=${searchTerm}`);
         }
     };
 
@@ -57,34 +45,36 @@ const Navbar = ({ onSearchClick }) => {
                 <button onClick={() => navigate('/dresses/EVENING%20DRESSES')}>EVENING DRESSES</button>
                 <button onClick={() => navigate('/dresses/DAY%20DRESSES')}>DAY DRESSES</button>
             </div>
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button onClick={navitateToSearch}>Search</button>
+            </div>
             <div className="navbar-icons">
-                <a onClick={toggleDropdown} aria-label="Profile">
+                {!isLoggedIn && (
+                    <>
+                        <button onClick={handleLoginRedirect} className="login-button">Login</button>
+                    </>
+                )}
+                <a onClick={() => navigate('/account')} aria-label="Account">
                     <i className="fas fa-user"></i>
                 </a>
-                {showDropdown && (
-                    <div className={`dropdown-content ${showDropdown ? 'show-dropdown' : ''}`}>
-                        {isLoggedIn ? (
-                            <button onClick={handleLogout} className="logout-button">Logout</button>
-                        ) : (
-                            <>
-                                <button onClick={handleLoginRedirect} className="login-button">Login</button>
-                                <button onClick={handleRegister} className="register-button">Register</button>
-                            </>
-                        )}
-                    </div>
-                )}
-                <a onClick={handleCartRedirect} aria-label="Cart">
+                <a onClick={() => navigate('/cart')} aria-label="Cart">
                     <i className="fas fa-shopping-cart"></i>
                 </a>
                 <a onClick={() => navigate('/wishlist')} aria-label="Wishlist">
                     <i className="fas fa-heart"></i>
                 </a>
-                <a onClick={onSearchClick} aria-label="Search">
-                    <i className="fas fa-search"></i>
-                </a>
                 <a href="#menu" aria-label="Menu">
                     <i className="fas fa-bars"></i>
                 </a>
+                {isLoggedIn && (
+                    <button onClick={handleLogout} className="logout-button">Logout</button>
+                )}
             </div>
         </header>
     );
