@@ -109,8 +109,22 @@ public class UserController
     @PutMapping("/user")
     public ResponseEntity<User> updateUserData(@RequestBody User userData)
     {
-        User updatedUser = userRepository.save(userData);
-        return ResponseEntity.ok(updatedUser);
+
+        Optional<User> existingUserOptional = userRepository.findById(userData.getId());
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+
+
+            if (!userData.getPassword().equals(existingUser.getPassword()))
+            {
+                userData.setPassword(passwordEncoder.encode(userData.getPassword()));
+            }
+
+            User updatedUser = userRepository.save(userData);
+            return ResponseEntity.ok(updatedUser);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/addresses/{userId}")
