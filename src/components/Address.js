@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import '../styles/Address.css';
@@ -12,7 +12,40 @@ const Address = () => {
         country: '',
     });
 
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.error('No user ID found, redirecting to login');
+            navigate('/login');
+            return;
+        }
+
+        const fetchAddress = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/addresses/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch address data.');
+                }
+
+                const data = await response.json();
+                setAddress(data);
+            } catch (err) {
+                console.error('Failed to fetch address:', err);
+                setError('Failed to load address. Please try again later.');
+            }
+        };
+
+        fetchAddress();
+    }, [navigate]);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -22,14 +55,38 @@ const Address = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Address submitted:', address);
-        // Poți adăuga logica pentru a salva adresa pe backend aici
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.error('No user ID found, cannot save address');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/addresses/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(address),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update address.');
+            }
+
+            console.log('Address updated successfully');
+            setError(null);
+        } catch (err) {
+            console.error('Failed to update address:', err);
+            setError('Failed to update address. Please try again later.');
+        }
     };
 
     const handleLogout = () => {
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userId');
         navigate('/login');
     };
 
@@ -39,6 +96,7 @@ const Address = () => {
             <div className="content">
                 <div className="add-address-container">
                     <h2>ADD A NEW ADDRESS</h2>
+                    {error && <p className="error-message">{error}</p>}
                     <form className="add-address-form" onSubmit={handleSubmit}>
                         <label>Street Address*</label>
                         <input
@@ -91,7 +149,6 @@ const Address = () => {
             </div>
         </div>
     );
-
 };
 
 export default Address;

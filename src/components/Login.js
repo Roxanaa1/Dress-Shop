@@ -91,6 +91,10 @@ function Login() {
                     <div className="register-link">
                         <p>You don't have an account? <button onClick={handleRegisterRedirect}>Sign up</button></p>
                     </div>
+                    <div className="forgot-password">
+                        <button className="forgot-password" onClick={() => navigate('/ForgotPassword')}>Forgot Password???
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

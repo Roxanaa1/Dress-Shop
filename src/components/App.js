@@ -11,6 +11,7 @@ import Account from './Account';
 import Search from './Search';
 import Address from "./Address";
 import Sidebar from "./Sidebar";
+import ForgotPassword from './ForgotPassword';
 
 const AppContent = () => {
     const location = useLocation();
@@ -24,13 +25,14 @@ const AppContent = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/ProductDetails/:id" element={<ProductDetails />} />
-                <Route path="/dresses/:filter" element={<Home />} />8
+                <Route path="/dresses/:filter" element={<Home />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/address" element={<Address/>} />
                 <Route path="/sidebar" element={<Sidebar />} />
+                <Route path="/forgotPassword" element={<ForgotPassword />} />
 
                 <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
             </Routes>

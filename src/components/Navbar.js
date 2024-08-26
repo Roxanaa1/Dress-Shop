@@ -36,8 +36,9 @@ const Navbar = () => {
             <div className="navbar-left">
                 <div className="navbar-brand" onClick={() => navigate('/')}></div>
                 <button onClick={() => navigate('/dresses/all')}>DRESSES</button>
-                <button onClick={() => navigate('/dresses/EVENING%20DRESSES')}>EVENING DRESSES</button>
-                <button onClick={() => navigate('/dresses/DAY%20DRESSES')}>DAY DRESSES</button>
+                <button onClick={() => navigate('/?filter=EVENING%20DRESSES')}>EVENING DRESSES</button>
+                <button onClick={() => navigate('/?filter=DAY%20DRESSES')}>DAY DRESSES</button>
+
             </div>
             <div className="search-bar">
                 <input

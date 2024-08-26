@@ -1,26 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Account.css';
 
 const Account = () => {
     const [user, setUser] = useState({
-        name: "Jane Doe",
+        email: '',
         firstName: '',
         lastName: '',
-        email: 'jane.doe@example.com',
         phoneNumber: '',
-        password: '',
-        address: "123 Fashion Ave",
-        city: "New York",
-        postalCode: "10001",
+        password: ''
     });
-
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem('isLoggedIn');
-        navigate('/login');
-    };
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.error('No user ID found, redirecting to login');
+            navigate('/login');
+            return;
+        }
+
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/users/user/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to fetch user data.');
+                }
+
+                setUser(data);
+            } catch (err) {
+                setError(err.message);
+                console.error('Failed to fetch user data:', err);
+            }
+        };
+
+        fetchData();
+    }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -30,10 +53,40 @@ const Account = () => {
         }));
     };
 
-    const handleSaveProfile = () => {
-        alert('Profile updated successfully!');
-        console.log('Saved user data:', user);
+    const handleSaveProfile = async () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.error('No user ID found, cannot save data');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/users/user`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user)
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to update user data.');
+            }
+
+            console.log('Updated user data:', data);
+        } catch (err) {
+            setError(err.message);
+            console.error('Failed to update user data:', err);
+        }
     };
+
+    const handleLogout = () => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userId');
+        navigate('/login');
+    };
+
 
     return (
         <div className="account-container">
@@ -46,7 +99,7 @@ const Account = () => {
 
             <div className="content">
                 <div className="personal-data-container">
-                    <h2>PERSONAL DATA</h2>
+                <h2>PERSONAL DATA</h2>
                     <div className="personal-info">
                         <h3>Identification Data</h3>
                         <label>Email</label>
