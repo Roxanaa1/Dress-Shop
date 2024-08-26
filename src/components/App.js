@@ -9,6 +9,8 @@ import Cart from './Cart';
 import Wishlist from './Wishlist';
 import Account from './Account';
 import Search from './Search';
+import Address from "./Address";
+import Sidebar from "./Sidebar";
 
 const AppContent = () => {
     const location = useLocation();
@@ -27,6 +29,8 @@ const AppContent = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/address" element={<Address/>} />
+                <Route path="/sidebar" element={<Sidebar />} />
 
                 <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
             </Routes>

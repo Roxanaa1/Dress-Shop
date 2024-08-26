@@ -107,6 +107,8 @@ button.register-button {
     color: #A7727D;
     background-color: #F8EDE3;
     box-sizing: border-box;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .search-bar button {
@@ -117,7 +119,9 @@ button.register-button {
     color: #F8EDE3;
     font-size: 20px;
     cursor: pointer;
+    margin-top: 5px;
     width: 120px;
+    height: 40px;
 
 }
 .search-bar button:hover {

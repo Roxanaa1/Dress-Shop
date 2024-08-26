@@ -25,12 +25,6 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('isLoggedIn');
-        setIsLoggedIn(false);
-        navigate('/');
-    };
-
     const navitateToSearch = () => {
         if (searchTerm.trim() !== '') {
             navigate(`/search?text=${searchTerm}`);
@@ -72,9 +66,6 @@ const Navbar = () => {
                 <a href="#menu" aria-label="Menu">
                     <i className="fas fa-bars"></i>
                 </a>
-                {isLoggedIn && (
-                    <button onClick={handleLogout} className="logout-button">Logout</button>
-                )}
             </div>
         </header>
     );

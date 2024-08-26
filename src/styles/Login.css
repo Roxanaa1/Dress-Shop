@@ -3,7 +3,7 @@ body, html {
     padding: 0;
     height: 100%;
     width: 100%;
-    font-family: Arial, sans-serif;
+    font-family: 'Mate', serif;
 }
 
 body.login-page {
@@ -64,7 +64,7 @@ h2 {
     padding: 5px 10px;
     font-size: 17px;
     cursor: pointer;
-    background-color: gray;
+    background-color: #A7727D;
     color: white;
     border: none;
     border-radius: 5px;
