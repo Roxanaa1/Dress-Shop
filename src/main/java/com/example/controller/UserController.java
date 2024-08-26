@@ -7,6 +7,7 @@ import com.example.model.User;
 import com.example.model.dtos.AddressDTO;
 import com.example.model.dtos.UserDTO;
 import com.example.repository.CartRepository;
+import com.example.repository.UserRepository;
 import com.example.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,16 @@ public class UserController
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder,CartRepository cartRepository)
+    public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder,CartRepository cartRepository,UserRepository userRepository)
     {
         this.userService = userService;
         this.userMapper = userMapper;
         this.passwordEncoder=passwordEncoder;
         this.cartRepository=cartRepository;
+        this.userRepository=userRepository;
     }
 
 
@@ -92,6 +95,21 @@ public class UserController
         } else {
             return ResponseEntity.badRequest().body(new MessageResponse("User does not exist!"));
         }
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<User> getUserData(@PathVariable int id)
+    {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PutMapping("/user")
+    public ResponseEntity<User> updateUserData(@RequestBody User userData) {
+        User updatedUser = userRepository.save(userData);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @PostMapping("/addresses/{userId}")

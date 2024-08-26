@@ -52,13 +52,6 @@ public class ProductController
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDTO);
     }
 
-//    @GetMapping("/getProductById/{id}")
-//    public ResponseEntity<ProductDTO> getProductById(@PathVariable int id)
-//    {
-//        Optional<Product> product = productService.getProductById(id);
-//        return product.map(p -> ResponseEntity.ok(productMapper.productToProductDTO(p)))
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
     @DeleteMapping("/deleteProduct/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable int id)
     {
