@@ -98,16 +98,17 @@ public class UserController
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUserData(@PathVariable int id)
+    public ResponseEntity<UserDTO> getUserData(@PathVariable int id)
     {
         Optional<User> user = userRepository.findById(id);
-        return user.map(ResponseEntity::ok)
+        return user.map(u -> ResponseEntity.ok(userMapper.userToUserDTO(u)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
     @PutMapping("/user")
-    public ResponseEntity<User> updateUserData(@RequestBody User userData) {
+    public ResponseEntity<User> updateUserData(@RequestBody User userData)
+    {
         User updatedUser = userRepository.save(userData);
         return ResponseEntity.ok(updatedUser);
     }
