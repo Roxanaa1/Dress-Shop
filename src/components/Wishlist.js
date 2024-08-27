@@ -58,7 +58,7 @@ const Wishlist = () => {
             })
             .catch(error => {
                 console.error('Error removing item:', error);
-                alert('Eroare la ștergerea produsului din wishlist.');
+                alert('Eroare ');
             });
     };
 
@@ -77,10 +77,10 @@ const Wishlist = () => {
                                 <div className="wishlist-details">
                                     <h3>{item.name}</h3>
                                     <p>{item.price}</p>
-                                    <button className="remove-button" onClick={() => handleRemoveClick(item.id)}>
-                                        <i className="fas fa-trash"></i>
-                                    </button>
                                 </div>
+                                <button className="wishlist-remove-button" onClick={() => handleRemoveClick(item.id)}>
+                                    <i className="fas fa-trash"></i>
+                                </button>
                             </div>
                         ))}
                     </div>

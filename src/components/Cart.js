@@ -16,9 +16,11 @@ const Cart = () => {
         city: '',
         address: '',
         streetLine: '',
-        postalCode: ''
+        postalCode: '',
+        deliveryAddressId: null,
+        invoiceAddressId: null
     });
-    const [paymentMethod, setPaymentMethod] = useState('ramburs');
+    const [paymentMethod, setPaymentMethod] = useState('CASH');
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -160,8 +162,49 @@ const Cart = () => {
     const total = subtotal - (subtotal * discount) + shippingCost;
 
     const handleCheckout = () => {
-        navigate('/checkout');
+        if (cartItems.length === 0) {
+            alert("Coșul tău este gol!");
+            return;
+        }
+
+        const userId = localStorage.getItem('userId');
+        const cartId = localStorage.getItem('cartId');
+
+        const orderDetails = {
+            userId: parseInt(userId, 10),
+            cartId: parseInt(cartId, 10),
+            paymentMethod: paymentMethod.toUpperCase(),
+            deliveryAddress: deliveryDetails.deliveryAddressId || parseInt(localStorage.getItem('defaultDeliveryAddress'), 10),
+            invoiceAddress: deliveryDetails.invoiceAddressId || parseInt(localStorage.getItem('defaultBillingAddress'), 10),
+            totalPrice: total,
+            orderDate: new Date().toISOString().split('T')[0]
+        };
+
+        fetch('http://localhost:8080/orders/createOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderDetails)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Eroare la plasarea comenzii');
+                }
+            })
+            .then(data => {
+                console.log('Comanda a fost plasată cu succes:', data);
+                alert('Comanda a fost plasată cu succes!');
+
+            })
+            .catch(error => {
+                console.error('Eroare la plasarea comenzii:', error);
+                alert('Eroare la plasarea comenzii: ' + error.message);
+            });
     };
+
 
     return (
         <div className="cart-page">
@@ -192,13 +235,15 @@ const Cart = () => {
                                             onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
                                         />
                                     </div>
-                                    <button onClick={() => handleRemoveItem(item.id)} className="remove-button">Șterge
-                                    </button>
                                 </div>
+                                <button className="remove-button" onClick={() => handleRemoveItem(item.id)}>
+                                    <i className="fas fa-trash"></i>
+                                </button>
                             </div>
                         ))
                     )}
                 </div>
+
 
             </div>
 
@@ -301,8 +346,8 @@ const Cart = () => {
                         <label>
                         <input
                                 type="radio"
-                                value="ramburs"
-                                checked={paymentMethod === 'ramburs'}
+                                value="CASH"
+                                checked={paymentMethod === 'CASH'}
                                 onChange={handlePaymentChange}
                             />
                             Plata la livrare (Ramburs)

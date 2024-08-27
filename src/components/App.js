@@ -12,6 +12,7 @@ import Search from './Search';
 import Address from "./Address";
 import Sidebar from "./Sidebar";
 import ForgotPassword from './ForgotPassword';
+import OrderSuccess from './OrderSuccess';
 
 const AppContent = () => {
     const location = useLocation();
@@ -33,6 +34,7 @@ const AppContent = () => {
                 <Route path="/address" element={<Address/>} />
                 <Route path="/sidebar" element={<Sidebar />} />
                 <Route path="/forgotPassword" element={<ForgotPassword />} />
+                <Route path="/orderSuccess" element={<OrderSuccess />} />
 
                 <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
             </Routes>
