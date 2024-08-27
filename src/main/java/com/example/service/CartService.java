@@ -123,4 +123,14 @@ public class CartService
         cartRepository.deleteById(id);
     }
 
+    public void clearCart(int cartId) {
+
+        cartEntryRepository.deleteByCartId(cartId);
+    }
+    public Cart findCartById(int id)
+    {
+        return cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found with id: " + id));
+    }
+
+
 }

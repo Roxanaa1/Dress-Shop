@@ -3,14 +3,16 @@ package com.example.controller;
 import com.example.mapper.OrderMapper;
 import com.example.model.Order;
 import com.example.model.dtos.OrderDTO;
+import com.example.service.CartService;
 import com.example.service.OrderService;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
 @Controller
@@ -20,22 +22,32 @@ public class OrderController
 {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
+    private final CartService cartService;
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
     @Autowired
-    public OrderController(OrderService orderService,OrderMapper orderMapper)
+    public OrderController(OrderService orderService,OrderMapper orderMapper,CartService cartService)
     {
         this.orderService=orderService;
         this.orderMapper=orderMapper;
+        this.cartService=cartService;
     }
 
     @PostMapping("/createOrder")
-    public ResponseEntity<OrderDTO> addOrder(@RequestBody OrderDTO orderDTO)
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO)
     {
-        Order order=orderMapper.orderDTOToOrder(orderDTO);
-        Order savedOrder=orderService.createOrder(order);
-        OrderDTO savedOrderDTO=orderMapper.orderToOrderDTO(savedOrder);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedOrderDTO);
+        try {
+            Order order = orderService.createOrder(orderDTO);
+            OrderDTO createdOrderDTO = orderMapper.orderToOrderDTO(order);
+            return new ResponseEntity<>(createdOrderDTO, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Failed to create order: {}", e.getMessage(), e);
+            throw e;
+        }
     }
+
+
+
     @GetMapping("/getOrderById/{id}")
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable int id)
     {

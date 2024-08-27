@@ -1,6 +1,6 @@
 package com.example.model;
 
- public enum PaymentType {
+ public enum PaymentMethod {
     CASH,
     CREDIT_CARD,
     PAYPAL

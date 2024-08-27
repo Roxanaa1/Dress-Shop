@@ -30,14 +30,14 @@ public class Order
     private Cart cart;
 
     @Enumerated(EnumType.STRING)
-    private PaymentType paymentType;
+    private PaymentMethod paymentMethod;
 
-    public void setPaymentType(PaymentType paymentType)
+    public void setPaymentMethod(PaymentMethod paymentMethod)
     {
-        if (paymentType == null) {
+        if (paymentMethod == null) {
             throw new IllegalArgumentException("PaymentType cannot be null");
         }
-        this.paymentType = paymentType;
+        this.paymentMethod = paymentMethod;
     }
     private int deliveryAddress;
     private int invoiceAddress;

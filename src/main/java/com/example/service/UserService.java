@@ -112,4 +112,9 @@ public class UserService
         return addressMapper.addressToAddressDTO(address);
     }
 
+    public User getUserById(int id)
+    {
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
 }

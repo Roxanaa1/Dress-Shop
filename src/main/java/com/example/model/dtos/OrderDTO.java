@@ -7,7 +7,7 @@ public class OrderDTO
     private int id;
     private int userId;
     private int cartId;
-    private String paymentType;
+    private String paymentMethod;
     private int deliveryAddress;
     private int invoiceAddress;
     private float totalPrice;
