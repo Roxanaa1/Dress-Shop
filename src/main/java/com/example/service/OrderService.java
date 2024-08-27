@@ -3,10 +3,7 @@ package com.example.service;
 import com.example.mapper.OrderMapper;
 import com.example.model.*;
 import com.example.model.dtos.OrderDTO;
-import com.example.repository.AddressRepository;
-import com.example.repository.CartRepository;
-import com.example.repository.OrderRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,48 +23,41 @@ public class OrderService
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final OrderMapper orderMapper;
+    private final ProductRepository productRepository;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
-    public OrderService(OrderRepository orderRepository,UserRepository userRepository,CartRepository cartRepository,AddressRepository addressRepository,OrderMapper orderMapper)
+    public OrderService(OrderRepository orderRepository,UserRepository userRepository,CartRepository cartRepository,AddressRepository addressRepository,OrderMapper orderMapper,ProductRepository productRepository)
     {
         this.orderRepository=orderRepository;
         this.userRepository=userRepository;
         this.cartRepository=cartRepository;
         this.orderMapper=orderMapper;
+        this.productRepository=productRepository;
 
     }
 
     @Transactional
-    public Order createOrder(OrderDTO orderDTO)
-    {
+    public Order createOrder(OrderDTO orderDTO) {
         logger.info("Attempting to create order with details: {}", orderDTO);
         try {
-
             User user = userRepository.findById(orderDTO.getUserId())
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + orderDTO.getUserId()));
 
             Order order = orderMapper.orderDTOToOrder(orderDTO);
             order.setOrderDate(LocalDate.now());
             order.setTotalPrice(orderDTO.getTotalPrice());
-            System.out.println("Payment method received: " + orderDTO.getPaymentMethod());
 
             order.setPaymentMethod(PaymentMethod.valueOf(orderDTO.getPaymentMethod()));
-            if (orderDTO.getPaymentMethod() == null || PaymentMethod.valueOf(orderDTO.getPaymentMethod()) == null)
-            {
+            if (orderDTO.getPaymentMethod() == null || PaymentMethod.valueOf(orderDTO.getPaymentMethod()) == null) {
                 throw new IllegalArgumentException("Invalid or missing payment method.");
             }
 
-
-            if (orderDTO.getDeliveryAddress() == 0)
-            {
+            if (orderDTO.getDeliveryAddress() == 0) {
                 orderDTO.setDeliveryAddress(user.getDefaultDeliveryAddress());
-                System.out.println(orderDTO.getDeliveryAddress());
             }
-            if (orderDTO.getInvoiceAddress() == 0)
-            {
+            if (orderDTO.getInvoiceAddress() == 0) {
                 orderDTO.setInvoiceAddress(user.getDefaultBillingAddress());
-                System.out.println(orderDTO.getInvoiceAddress());
             }
 
             order.setDeliveryAddress(orderDTO.getDeliveryAddress());
@@ -76,16 +66,34 @@ public class OrderService
             Order savedOrder = orderRepository.save(order);
             logger.info("Order saved with ID: {}", savedOrder.getId());
 
+
+            updateProductQuantities(orderDTO.getCartId());
+
             clearCart(orderDTO.getCartId());
             logger.info("Cart cleared for Cart ID: {}", orderDTO.getCartId());
 
             return savedOrder;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error creating order: {}", e.getMessage(), e);
             throw e;
         }
     }
+
+
+    @Transactional
+    public void updateProductQuantities(int cartId)
+    {
+        cartRepository.findById(cartId).ifPresent(cart -> {
+            cart.getCartEntries().forEach(entry -> {
+                Product product = entry.getProduct();
+                int newQuantity = product.getAvailableQuantity() - entry.getQuantity();
+                product.setAvailableQuantity(newQuantity);
+                productRepository.save(product);
+            });
+            logger.info("Product quantities updated for Cart ID: {}", cartId);
+        });
+    }
+
 
 
     @Transactional

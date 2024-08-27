@@ -59,7 +59,6 @@ public class CartService
         if (existingEntry != null) {
             existingEntry.setQuantity(existingEntry.getQuantity() + cartEntryDTO.getQuantity());
             existingEntry.setTotalPricePerEntry(existingEntry.getQuantity() * existingEntry.getPricePerPiece());
-
         } else {
             CartEntry newEntry = cartMapper.cartEntryDTOToCartEntry(cartEntryDTO);
             newEntry.setProduct(product);
@@ -67,11 +66,7 @@ public class CartService
             newEntry.setTotalPricePerEntry(newEntry.getQuantity() * newEntry.getPricePerPiece());
             cart.getCartEntries().add(newEntry);
             cartEntryRepository.save(newEntry);
-
         }
-
-        product.setAvailableQuantity(product.getAvailableQuantity() - cartEntryDTO.getQuantity());
-
         float updatedTotalPrice = cart.getCartEntries().stream()
                 .map(CartEntry::getTotalPricePerEntry)
                 .reduce(0f, Float::sum);
@@ -79,9 +74,10 @@ public class CartService
 
         Cart updatedCart = cartRepository.save(cart);
 
-        productRepository.save(product);
+
         return cartMapper.cartToCartDTO(updatedCart);
     }
+
 
 
     public void removeItem(int itemId)
