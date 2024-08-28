@@ -24,16 +24,18 @@ public class OrderService
     private final CartRepository cartRepository;
     private final OrderMapper orderMapper;
     private final ProductRepository productRepository;
+    private final EmailService emailService;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
-    public OrderService(OrderRepository orderRepository,UserRepository userRepository,CartRepository cartRepository,AddressRepository addressRepository,OrderMapper orderMapper,ProductRepository productRepository)
+    public OrderService(OrderRepository orderRepository,UserRepository userRepository,CartRepository cartRepository,AddressRepository addressRepository,OrderMapper orderMapper,ProductRepository productRepository,EmailService emailService)
     {
         this.orderRepository=orderRepository;
         this.userRepository=userRepository;
         this.cartRepository=cartRepository;
         this.orderMapper=orderMapper;
         this.productRepository=productRepository;
+        this.emailService=emailService;
 
     }
 
@@ -66,6 +68,9 @@ public class OrderService
             Order savedOrder = orderRepository.save(order);
             logger.info("Order saved with ID: {}", savedOrder.getId());
 
+            emailService.sendOrderConfirmationEmail(user.getEmail(), "Confirmare comandă", "Comanda ta cu numărul " + savedOrder.getId() + " a fost plasată cu succes.");
+
+
 
             updateProductQuantities(orderDTO.getCartId());
 
@@ -73,6 +78,7 @@ public class OrderService
             logger.info("Cart cleared for Cart ID: {}", orderDTO.getCartId());
 
             return savedOrder;
+
         } catch (Exception e) {
             logger.error("Error creating order: {}", e.getMessage(), e);
             throw e;
