@@ -5,6 +5,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
+    const [cart, setCart] = useState([]);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [cartEntry, setCartEntry] = useState([]);
     const [discountCode, setDiscountCode] = useState('');
     const [discount, setDiscount] = useState(0);
     const [deliveryDetails, setDeliveryDetails] = useState({
@@ -196,7 +199,9 @@ const Cart = () => {
             })
             .then(data => {
                 console.log('Comanda a fost plasată cu succes:', data);
-                alert('Comanda a fost plasată cu succes!');
+                clearCart();
+
+                navigate('/OrderSuccess');
 
             })
             .catch(error => {
@@ -204,6 +209,19 @@ const Cart = () => {
                 alert('Eroare la plasarea comenzii: ' + error.message);
             });
     };
+    const clearCart = () => {
+        setCartItems([]);
+        setCart([]);
+        setTotalPrice(0);
+        setCartEntry([]);
+    };
+
+    useEffect(() => {
+        console.log('Cart updated:', cart);
+        console.log('Cart items updated:', cartItems);
+        console.log('Total price updated:', totalPrice);
+        console.log('Cart entry updated:', cartEntry);
+    }, [cart, cartItems, totalPrice, cartEntry]);
 
 
     return (
