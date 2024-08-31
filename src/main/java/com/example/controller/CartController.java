@@ -73,12 +73,26 @@ public class CartController
 
 
     @DeleteMapping("/removeItem/{itemId}")
-    public ResponseEntity<?> removeItemFromCart(@PathVariable int itemId)
-    {
+    public ResponseEntity<?> removeItemFromCart(@PathVariable int itemId) {
         try {
+            System.out.println("Attempting to remove item with ID: " + itemId);
             cartService.removeItem(itemId);
+            System.out.println("Item removed successfully with ID: " + itemId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/clear/{cartId}")
+    public ResponseEntity<?> clearCart(@PathVariable int cartId)
+    {
+        try {
+            cartService.clearCart(cartId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

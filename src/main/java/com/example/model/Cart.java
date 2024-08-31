@@ -27,4 +27,8 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart")
     private List<CartEntry> cartEntries;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
+
 }

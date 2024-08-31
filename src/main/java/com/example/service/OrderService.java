@@ -25,10 +25,12 @@ public class OrderService
     private final OrderMapper orderMapper;
     private final ProductRepository productRepository;
     private final EmailService emailService;
+
+    private final CartEntryRepository cartEntryRepository;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
-    public OrderService(OrderRepository orderRepository,UserRepository userRepository,CartRepository cartRepository,AddressRepository addressRepository,OrderMapper orderMapper,ProductRepository productRepository,EmailService emailService)
+    public OrderService(OrderRepository orderRepository,UserRepository userRepository,CartRepository cartRepository,AddressRepository addressRepository,OrderMapper orderMapper,ProductRepository productRepository,EmailService emailService,CartEntryRepository cartEntryRepository)
     {
         this.orderRepository=orderRepository;
         this.userRepository=userRepository;
@@ -36,11 +38,13 @@ public class OrderService
         this.orderMapper=orderMapper;
         this.productRepository=productRepository;
         this.emailService=emailService;
+        this.cartEntryRepository=cartEntryRepository;
 
     }
 
     @Transactional
-    public Order createOrder(OrderDTO orderDTO) {
+    public Order createOrder(OrderDTO orderDTO)
+    {
         logger.info("Attempting to create order with details: {}", orderDTO);
         try {
             User user = userRepository.findById(orderDTO.getUserId())
@@ -68,11 +72,12 @@ public class OrderService
             Order savedOrder = orderRepository.save(order);
             logger.info("Order saved with ID: {}", savedOrder.getId());
 
-            emailService.sendOrderConfirmationEmail(user.getEmail(), "Confirmare comandă", "Comanda ta cu numărul " + savedOrder.getId() + " a fost plasată cu succes.");
-
-
+           //emailService.sendOrderConfirmationEmail(user.getEmail(), "Confirmare comandă", "Comanda ta cu numărul " + savedOrder.getId() + " a fost plasată cu succes.");
 
             updateProductQuantities(orderDTO.getCartId());
+
+
+            Cart newCart = createNewCartFromOldCart(orderDTO.getCartId());
 
             clearCart(orderDTO.getCartId());
             logger.info("Cart cleared for Cart ID: {}", orderDTO.getCartId());
@@ -85,6 +90,30 @@ public class OrderService
         }
     }
 
+    private Cart createNewCartFromOldCart(int oldCartId)
+    {
+        Cart oldCart = cartRepository.findById(oldCartId)
+                .orElseThrow(() -> new EntityNotFoundException("Cart not found with id: " + oldCartId));
+
+
+        Cart newCart = new Cart();
+        newCart.setUser(oldCart.getUser());
+        newCart.setTotalPrice(oldCart.getTotalPrice());
+
+        Cart savedNewCart = cartRepository.save(newCart);
+
+        for (CartEntry entry : oldCart.getCartEntries()) {
+            CartEntry newEntry = new CartEntry();
+            newEntry.setCart(savedNewCart);
+            newEntry.setProduct(entry.getProduct());
+            newEntry.setQuantity(entry.getQuantity());
+            newEntry.setPricePerPiece(entry.getPricePerPiece());
+            newEntry.setTotalPricePerEntry(entry.getTotalPricePerEntry());
+            cartEntryRepository.save(newEntry);
+        }
+
+        return savedNewCart;
+    }
 
     @Transactional
     public void updateProductQuantities(int cartId)

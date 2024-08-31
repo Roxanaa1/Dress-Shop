@@ -119,6 +119,7 @@ public class CartService
         cartRepository.deleteById(id);
     }
 
+    @Transactional
     public void clearCart(int cartId) {
 
         cartEntryRepository.deleteByCartId(cartId);
