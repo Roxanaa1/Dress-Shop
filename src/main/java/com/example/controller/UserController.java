@@ -43,65 +43,39 @@ public class UserController
     }
 
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserDTO newUser)
-    {
-        boolean userExists = userService.existsByEmail(newUser.getEmail()).orElse(false);
-
-        if (userExists)
-        {
-            return ResponseEntity.badRequest().body("User already exists!");
-        }
-
-        User user = userMapper.userDTOToUser(newUser);
-        User savedUser = userService.createUser(user);
-        UserDTO savedUserDTO = userMapper.userToUserDTO(savedUser);
-
-        return ResponseEntity.ok(savedUserDTO);
+    @PostMapping()
+    public ResponseEntity<?> create(@RequestBody UserDTO userDto) {
+        User userEntity = UserMapper.toEntity(userDto);
+        User createdUser = userService.create(userEntity);
+        UserDTO createdUserDTO = UserMapper.toDto(createdUser);
+        return ResponseEntity.ok(createdUserDTO);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserDTO loginUser)
-    {
-        Optional<User> userOptional = userService.findUserByEmail(loginUser.getEmail());
+    public ResponseEntity<?> login(@RequestBody UserDTO userDto){
+        User userToLogin = UserMapper.toEntity(userDto);
+        User user = userService.login(userToLogin.getEmail(), userToLogin.getPassword());
+        return ResponseEntity.ok(UserMapper.toDto(user));
+    }
 
-        if (userOptional.isPresent())
-        {
-            User user = userOptional.get();
-
-            if (passwordEncoder.matches(loginUser.getPassword(), user.getPassword()))
-            {
-                if (user.getCart() == null)
-                {
-                    Cart newCart = new Cart();
-                    newCart.setUser(user);
-                    Cart savedCart = cartRepository.save(newCart);
-                    user.setCart(savedCart);
-                    userService.updateUser(user, user.getId());
-                }
-
-                UserDTO userDTO = userMapper.userToUserDTO(user);
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("userId", user.getId());
-                response.put("cartId", userDTO.getCartId());
-                response.put("message", "Login successful");
-
-                return ResponseEntity.ok(response);
-            } else
-            {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Invalid password!"));
-            }
-        } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("User does not exist!"));
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyAccount(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        String code = requestBody.get("code");
+        try {
+            userService.verify(email, code);
+            return ResponseEntity.ok("Cont verificat cu succes!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Verificarea a eșuat: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> getUserData(@PathVariable int id)
     {
         Optional<User> user = userRepository.findById(id);
-        return user.map(u -> ResponseEntity.ok(userMapper.userToUserDTO(u)))
+        return user.map(u -> ResponseEntity.ok(UserMapper.toDto(u)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -144,22 +118,11 @@ public class UserController
         }
     }
 
-
-    @PostMapping("/createUser")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO)
-    {
-
-        User user = userMapper.userDTOToUser(userDTO);
-        User savedUser = userService.createUser(user);
-        UserDTO savedUserDTO = userMapper.userToUserDTO(savedUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUserDTO);
-    }
-
     @GetMapping("/getUserById/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable int id)
     {
         Optional<User> user = userService.findUserById(id);
-        return user.map(u -> ResponseEntity.ok(userMapper.userToUserDTO(u)))
+        return user.map(u -> ResponseEntity.ok(UserMapper.toDto(u)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -167,9 +130,9 @@ public class UserController
     public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserDTO userDTO)
     {
         try {
-            User userDetails = userMapper.userDTOToUser(userDTO);
+            User userDetails = UserMapper.toEntity(userDTO);
             User updatedUser = userService.updateUser(userDetails, id);
-            UserDTO updatedUserDTO = userMapper.userToUserDTO(updatedUser);
+            UserDTO updatedUserDTO = UserMapper.toDto(updatedUser);
             return ResponseEntity.ok(updatedUserDTO);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

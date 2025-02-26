@@ -12,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserService
@@ -21,24 +23,68 @@ public class UserService
     private final PasswordEncoder passwordEncoder;
     private final AddressMapper addressMapper;
     private final AddressRepository addressRepository;
+    private final EmailService emailService;
     @Autowired
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository)
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository,EmailService emailService)
     {
         this.userRepository=userRepository;
         this.passwordEncoder=passwordEncoder;
         this.addressMapper=addressMapper;
         this.addressRepository=addressRepository;
+        this.emailService=emailService;
     }
 
-    public User createUser(User user)
-    {
-        Optional<Boolean> userExists = userRepository.existsByEmail(user.getEmail());
-        if (userExists.orElse(false)) {
-            throw new IllegalStateException("User with email " + user.getEmail() + " already exists");
+    public User create(User user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        String verificationCode = String.valueOf(new Random().nextInt(100000, 999999));
+        user.setVerificationCode(verificationCode);
+        user.setVerificationCodeExpiration(LocalDateTime.now().plusMinutes(10));
+        user.setVerifiedAccount(false);
+
+        User savedUser = userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), verificationCode);
+        return savedUser;
+    }
+    public User verify(String email, String verificationCode) {
+        System.out.println("Email primit pentru verificare: " + email);
+        User user =userRepository.findByEmail(email.trim())
+
+
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        if (user.getVerificationCodeExpiration() == null || LocalDateTime.now().isAfter(user.getVerificationCodeExpiration())) {
+            throw new RuntimeException("Verification code has expired.");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if (!user.getVerificationCode().equals(verificationCode)) {
+            throw new RuntimeException("Invalid verification code.");
+        }
+
+        user.setVerifiedAccount(true);
+        user.setVerificationCode(null);
+        user.setVerificationCodeExpiration(null);
+
         return userRepository.save(user);
     }
+
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (!user.getVerifiedAccount()) {
+            throw new RuntimeException("Contul nu este verificat!");
+        }
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Parolă incorectă!");
+        }
+
+        return user;
+    }
+
 
     public Optional<User>  findUserById(int id)
     {

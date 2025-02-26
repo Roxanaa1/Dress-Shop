@@ -9,6 +9,15 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+
+import com.example.model.User;
+import com.example.model.dtos.UserDTO;
+import com.example.model.Cart;
+import com.example.model.Order;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,25 +25,47 @@ import java.util.stream.Collectors;
 public interface UserMapper
 {
 
+    public static UserDTO toDto(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setLastName(user.getLastName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setPassword(user.getPassword());
+        userDTO.setDefaultDeliveryAddress(user.getDefaultDeliveryAddress());
+        userDTO.setDefaultBillingAddress(user.getDefaultBillingAddress());
 
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+        // Adăugăm verificare pentru orders ca să evităm NullPointerException
+        userDTO.setOrderIds(user.getOrders() != null ?
+                user.getOrders().stream()
+                        .map(Order::getId)
+                        .collect(Collectors.toList())
+                : new ArrayList<>());
 
-    @Mapping(source = "orders", target = "orderIds", qualifiedByName = "ordersToOrderIds")
-    @Mapping(source = "cart.id", target = "cartId")
-    UserDTO userToUserDTO(User user);
+        userDTO.setCartId(user.getCart() != null ? user.getCart().getId() : null);
+        userDTO.setVerifiedAccount(user.getVerifiedAccount());
+        userDTO.setVerificationCode(user.getVerificationCode());
+        userDTO.setVerificationCodeExpiration(user.getVerificationCodeExpiration());
 
-    @Mapping(source = "password", target = "password")
-    User userDTOToUser(UserDTO userDTO);
-
-    @Named("ordersToOrderIds")
-    default List<Integer> ordersToOrderIds(List<Order> orders)
-    {
-        return orders.stream().map(Order::getId).collect(Collectors.toList());
+        return userDTO;
     }
 
-    @Named("cartToCartId")
-    default Integer cartToCartId(Cart cart)
-    {
-        return cart != null ? cart.getId() : null;
-    }
+
+    public static User toEntity(UserDTO userDTO) {
+            User user = new User();
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setEmail(userDTO.getEmail());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+            user.setPassword(userDTO.getPassword());
+            user.setDefaultDeliveryAddress(userDTO.getDefaultDeliveryAddress());
+            user.setDefaultBillingAddress(userDTO.getDefaultBillingAddress());
+            // You can set other properties as needed
+            user.setVerifiedAccount(userDTO.getVerifiedAccount());
+            user.setVerificationCode(userDTO.getVerificationCode());
+            user.setVerificationCodeExpiration(userDTO.getVerificationCodeExpiration());
+            return user;
+        }
+
 }

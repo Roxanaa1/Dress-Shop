@@ -1,41 +1,57 @@
 package com.example.service;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.util.StreamUtils;
+
 import java.io.IOException;
+
 import org.springframework.mail.MailParseException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
 import java.nio.charset.StandardCharsets;
+
 @Service
-public class EmailService
-{
-        @Autowired
-        private JavaMailSender mailSender;
+public class EmailService {
+    @Autowired
+    private JavaMailSender mailSender;
 
-        public void sendOrderConfirmationEmail(String to, String subject, String orderId) {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message);
+    public void sendOrderConfirmationEmail(String to, String subject, String orderId) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
 
-            try {
+        try {
 
-                //citeste html ul
-                Resource resource = new ClassPathResource("email.html");
-                String htmlContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+            //citeste html ul
+            Resource resource = new ClassPathResource("email.html");
+            String htmlContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
 
-                htmlContent = htmlContent.replace("{{orderId}}", orderId);
+            htmlContent = htmlContent.replace("{{orderId}}", orderId);
 
-                helper.setTo(to);
-                helper.setSubject(subject);
-                helper.setText(htmlContent, true);
-            } catch (MessagingException | IOException e) {
-                throw new MailParseException(e);
-            }
-
-            mailSender.send(message);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+        } catch (MessagingException | IOException e) {
+            throw new MailParseException(e);
         }
+
+        mailSender.send(message);
     }
+
+    public void sendVerificationEmail(String toEmail, String verificationCode) {
+        String verificationUrl = "http://localhost:3000/verify?code=" + verificationCode;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Account Verification");
+        message.setText("Please use the following code to verify your account: " + verificationUrl);
+
+        mailSender.send(message);
+    }
+}

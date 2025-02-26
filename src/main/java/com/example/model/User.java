@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -40,16 +42,25 @@ public class User {
     private int defaultBillingAddress;
 
     @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+    private List<Order> orders=new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Address> addresses;
+    private List<Address> addresses=new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Wishlist> wishlistEntries;
+    private List<Wishlist> wishlistEntries=new ArrayList<>();
+
+    @Column(name = "VERIFIED_ACCOUNT")
+    private Boolean verifiedAccount = false;
+
+    @Column(name = "VERIFICATION_CODE")
+    private String verificationCode;
+
+    @Column(name = "VERIFICATION_CODE_EXPIRATION")
+    private LocalDateTime verificationCodeExpiration;
 
 
     public User(int id) {
