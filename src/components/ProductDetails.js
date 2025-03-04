@@ -19,8 +19,10 @@ const ProductDetails = () =>
                 return response.json();
             })
             .then(data => {
+                console.log('Product data:', data);
                 setProduct(data);
                 setSelectedImage(data.productImages[0]);
+
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);

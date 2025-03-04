@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
@@ -19,7 +19,7 @@ function Login() {
     }, []);
 
     const handleInputChange = (e) => {
-        setCredentials({...credentials, [e.target.name]: e.target.value});
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
     };
 
     const handleLogin = async (event) => {
@@ -40,20 +40,34 @@ function Login() {
             }
 
             console.log('Login response data:', data);
+            // Salvează datele utilizatorului în localStorage
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('cartId', data.cartId);
+            localStorage.setItem('role', data.role); // Stocăm rolul utilizatorului
+            localStorage.setItem('email', data.email); // Salvează și email-ul utilizatorului
 
             console.log('Login successful:', data);
-            setSuccess(data.message);
+            localStorage.setItem('userId', data.id);
+
+            setSuccess('Login successful!');
             setError(null);
-            navigate('/');
+
+            // Verifică rolul utilizatorului din localStorage
+            const userRole = localStorage.getItem('role');
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+            if (isLoggedIn && userRole === 'ADMIN') {
+                navigate('/admin-dashboard');
+            } else if (isLoggedIn && userRole === 'USER') {
+                navigate('/user-dashboard');
+            }
+
         } catch (err) {
             setError(err.message);
             setSuccess(null);
         }
     };
-
 
     const handleRegisterRedirect = () => {
         navigate('/register');
@@ -92,7 +106,8 @@ function Login() {
                         <p>You don't have an account? <button onClick={handleRegisterRedirect}>Sign up</button></p>
                     </div>
                     <div className="forgot-password">
-                        <button className="forgot-password" onClick={() => navigate('/ForgotPassword')}>Forgot Password???
+                        <button className="forgot-password" onClick={() => navigate('/ForgotPassword')}>
+                            Forgot Password???
                         </button>
                     </div>
                 </form>

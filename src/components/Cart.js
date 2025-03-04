@@ -45,6 +45,7 @@ const Cart = () => {
                         return response.json();
                     })
                     .then(data => {
+                        console.log('Data received from server:', data);  // Logă datele primite de la server
                         if (data.cartEntries) {
                             const mappedItems = data.cartEntries.map(entry => ({
                                 id: entry.id,
@@ -66,7 +67,7 @@ const Cart = () => {
                     });
             }
         }
-    }, [navigate]);
+    }, [navigate,cartItems]);
 
     const handleRemoveItem = (id) => {
         fetch(`http://localhost:8080/cart/removeItem/${id}`, {
@@ -74,8 +75,27 @@ const Cart = () => {
         })
             .then(response => {
                 if (response.ok) {
-                    const updatedItems = cartItems.filter(item => item.id !== id);
-                    setCartItems(updatedItems);
+                    const cartId = localStorage.getItem('cartId');
+                    fetch(`http://localhost:8080/cart/getCartById/${cartId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Data received after DELETE:', data);
+                            if (data.cartEntries) {
+                                const updatedItems = data.cartEntries.map(entry => ({
+                                    id: entry.id,
+                                    image: entry.product.productImages[0],
+                                    name: entry.product.name,
+                                    color: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color')?.attributeValue.value || 'Culoare indisponibilă',
+                                    size: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size')?.attributeValue.value || 'Mărime indisponibilă',
+                                    price: entry.pricePerPiece,
+                                    quantity: entry.quantity,
+                                    totalPricePerEntry: entry.totalPricePerEntry
+                                }));
+                                setCartItems(updatedItems);
+                            } else {
+                                setCartItems([]);
+                            }
+                        });
                 } else {
                     console.error('Failed to remove item from cart');
                 }
@@ -84,6 +104,7 @@ const Cart = () => {
                 console.error('Error removing item:', error);
             });
     };
+
     const handleSaveDeliveryDetails = () => {
         const userId = localStorage.getItem('userId');
 
@@ -166,7 +187,7 @@ const Cart = () => {
 
     const handleCheckout = () => {
         if (cartItems.length === 0) {
-            alert("Coșul tău este gol!");
+            alert("Cosul tău este gol!");
             return;
         }
 
@@ -199,16 +220,30 @@ const Cart = () => {
             })
             .then(data => {
                 console.log('Comanda a fost plasată cu succes:', data);
-                clearCart();
 
-                navigate('/OrderSuccess');
-
+                fetch(`http://localhost:8080/cart/clear/${cartId}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            clearCart();
+                            navigate('/OrderSuccess');
+                        } else {
+                            console.error('Failed to clear cart in backend');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error clearing cart:', error);
+                    });
             })
             .catch(error => {
                 console.error('Eroare la plasarea comenzii:', error);
                 alert('Eroare la plasarea comenzii: ' + error.message);
             });
     };
+
+//        emailService.sendOrderConfirmationEmail(user.getEmail(), "Confirmare comandă", "Comanda ta cu numărul " + savedOrder.getId() + " a fost plasată cu succes.");
+
     const clearCart = () => {
         setCartItems([]);
         setCart([]);

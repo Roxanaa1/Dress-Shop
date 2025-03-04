@@ -25,12 +25,13 @@ const Wishlist = () => {
             .then(data => {
                 if (data.length > 0) {
                     const mappedItems = data.map(item => ({
-                        id: item.id,
+                        id: item.productDTO?.id,
                         image: item.productDTO?.productImages?.[0] || 'https://via.placeholder.com/150',
                         name: item.productDTO?.name || 'N/A',
                         price: item.productDTO?.price !== undefined ? `${item.productDTO.price} RON` : 'N/A',
                     }));
                     setWishlistItems(mappedItems);
+
                 } else {
                     setWishlistItems([]);
                 }

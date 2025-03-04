@@ -8,11 +8,13 @@ body, html {
     background-color: #F8EDE3;
 }
 
-h1 {
+.main-header h1 {
     font-family: 'Mate', serif;
     color: #A7727D;
-    margin-top: 50px;
+    margin-top: 30px;
+    margin-left: 400px;
 }
+
 
 .Home {
     text-align: center;
@@ -51,7 +53,7 @@ main {
 .image-wrapper img {
     width: auto;
     height: 600px;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .dress-info {
@@ -70,5 +72,44 @@ main {
     color: #A7727D;
     margin-bottom: 10px;
 }
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: -10px;
+    padding: 0 10px;
+    margin-top: 20px;
+    font-family: 'Mate', serif;
+}
 
+.filter-sort-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: nowrap;
+}
 
+.filter-sort-buttons button,
+.filter-sort-buttons select {
+    color: #945C70;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 17px;
+    background-color: #F8EDE3;
+    min-width: 90px;
+    font-family: 'Mate', serif;
+    text-align: center;
+}
+
+.filter-sort-buttons select {
+    color: #945C70;
+    background-color: #F8EDE3;
+    appearance: none;
+}
+
+.filter-sort-buttons button:hover,
+.filter-sort-buttons select:hover {
+    text-decoration: underline;
+}

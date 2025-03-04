@@ -10,28 +10,17 @@ body, html {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f9f9f9;
 }
 
-body.register-page {
+body.verify-page {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-image: url('/public/images/register.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
 }
 
-.register-background {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.register-form {
+.verify-container {
     width: 100%;
     max-width: 450px;
     padding: 20px;
@@ -39,26 +28,24 @@ body.register-page {
     border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: left;
+    text-align: center;
     margin: 20px auto;
-    margin-right: 350px;
 }
 
-.register-form h2 {
+.verify-container h2 {
     color: black;
     margin-bottom: 20px;
 }
 
-.register-form label {
+.verify-container label {
     display: block;
     color: #333;
     text-align: left;
-    padding-left: 5px;
     font-size: 14px;
     margin-bottom: 10px;
 }
 
-.register-form input {
+.verify-container input {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -67,7 +54,7 @@ body.register-page {
     font-size: 14px;
 }
 
-.register-form button {
+.verify-container button {
     width: 100%;
     padding: 10px;
     background-color: #A7727D;
@@ -78,14 +65,49 @@ body.register-page {
     transition: background-color 0.3s;
     font-size: 16px;
 }
-.register-form select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    background-color: white;
-    cursor: pointer;
+
+.verify-container button:hover {
+    background-color: #8f5a66;
 }
 
+.success-message {
+    color: green;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.verify-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 200px;
+}
+
+.verify-form {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.verify-title {
+    text-align: center;
+    font-size: 24px;
+    color: black;
+    margin-bottom: 20px;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.verify-container {
+    margin-top: 100px;
+}
