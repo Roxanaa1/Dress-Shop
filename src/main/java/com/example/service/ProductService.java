@@ -1,7 +1,11 @@
 package com.example.service;
 
 import com.example.mapper.ProductMapper;
+import com.example.model.Category;
 import com.example.model.Product;
+import com.example.model.ProductImage;
+import com.example.repository.CategoryRepository;
+import com.example.repository.ProductImageRepository;
 import com.example.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,18 +27,39 @@ public class ProductService
     private EntityManager entityManager;//pt search
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final ProductImageRepository productImageRepository;
+    private final CategoryRepository categoryRepository;
     @Autowired
-    public ProductService(ProductRepository productRepository,ProductMapper productMapper)
+    public ProductService(ProductRepository productRepository,ProductMapper productMapper,ProductImageRepository productImageRepository,CategoryRepository categoryRepository)
     {
         this.productRepository=productRepository;
         this.productMapper=productMapper;
+        this.productImageRepository=productImageRepository;
+        this.categoryRepository=categoryRepository;
 
     }
 
     public Product addProduct(Product product)
     {
+
+        if (product.getCategory() == null || product.getCategory().getName() == null) {
+            throw new IllegalArgumentException("Produsul trebuie sa aiba o categorie valida");
+        }
+
+        Category category = product.getCategory();
+        Category existingCategory = categoryRepository.findByName(category.getName());
+
+        if (existingCategory == null) {
+            existingCategory = categoryRepository.save(category);
+        }
+
+        product.setCategory(existingCategory);
+
         return productRepository.save(product);
     }
+
+
+
     public Optional<Product> getProductById(int id)
     {
         return productRepository.findById(id);
@@ -109,5 +134,14 @@ public class ProductService
 
         return entityManager.createQuery(cq).getResultList();
     }
+    public void addImageToProduct(int productId, String imageCode) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        ProductImage image = new ProductImage();
+        image.setProduct(product);
+        image.setCode(imageCode);
+
+        productImageRepository.save(image);
+    }
 }

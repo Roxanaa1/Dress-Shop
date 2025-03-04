@@ -62,6 +62,10 @@ public class User {
     @Column(name = "VERIFICATION_CODE_EXPIRATION")
     private LocalDateTime verificationCodeExpiration;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
 
     public User(int id) {
         this.id = id;

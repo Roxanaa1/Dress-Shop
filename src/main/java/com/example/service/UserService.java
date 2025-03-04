@@ -1,11 +1,11 @@
 package com.example.service;
 
 import com.example.mapper.AddressMapper;
-import com.example.model.Address;
-import com.example.model.User;
+import com.example.mapper.UserMapper;
+import com.example.model.*;
 import com.example.model.dtos.AddressDTO;
-import com.example.repository.AddressRepository;
-import com.example.repository.UserRepository;
+import com.example.model.dtos.UserDTO;
+import com.example.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,23 +20,39 @@ import java.util.Random;
 public class UserService
 {
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
     private final AddressMapper addressMapper;
     private final AddressRepository addressRepository;
     private final EmailService emailService;
+    private final RoleRepository roleRepository;
+    private final ProductImageRepository productImageRepository;
     @Autowired
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository,EmailService emailService)
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository,EmailService emailService,RoleRepository roleRepository,ProductRepository productRepository,ProductImageRepository productImageRepository)
     {
         this.userRepository=userRepository;
         this.passwordEncoder=passwordEncoder;
         this.addressMapper=addressMapper;
         this.addressRepository=addressRepository;
         this.emailService=emailService;
+        this.roleRepository=roleRepository;
+        this.productRepository=productRepository;
+        this.productImageRepository=productImageRepository;
+
     }
 
     public User create(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
+
+        RoleType selectedRole = (user.getRole() != null && user.getRole().getRoleType() != null)
+                ? user.getRole().getRoleType()
+                : RoleType.USER;
+
+        Role role = roleRepository.findByRoleType(selectedRole)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
         user.setPassword(encodedPassword);
+        user.setRole(role);
 
         String verificationCode = String.valueOf(new Random().nextInt(100000, 999999));
         user.setVerificationCode(verificationCode);
@@ -47,6 +63,11 @@ public class UserService
         emailService.sendVerificationEmail(user.getEmail(), verificationCode);
         return savedUser;
     }
+
+
+
+
+
     public User verify(String email, String verificationCode) {
         System.out.println("Email primit pentru verificare: " + email);
         User user =userRepository.findByEmail(email.trim())

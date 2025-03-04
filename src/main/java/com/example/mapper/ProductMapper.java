@@ -6,16 +6,17 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.w3c.dom.Attr;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "category", target = "category")
     @Mapping(source = "productImages", target = "productImages", qualifiedByName = "imagesToUrls")
     @Mapping(source = "productAttributeAttributeValues", target = "productAttributeAttributeValues", qualifiedByName = "mapProductProductAttributes")
     ProductDTO productToProductDTO(Product product);
 
-    @Mapping(source = "categoryId", target = "category.id")
+    @Mapping(source = "category", target = "category")
     @Mapping(target = "productImages", ignore = true)
     Product productDTOToProduct(ProductDTO productDTO);
 
@@ -41,17 +42,28 @@ public interface ProductMapper {
 
     @Named("mapProductProductAttributes")
     default List<ProductProductAttributeDTO> mapProductProductAttributes(List<ProductProductAttribute> productProductAttributes) {
+        if (productProductAttributes == null) {
+            return Collections.emptyList(); // Evită eroarea returnând o listă goală
+        }
         return productProductAttributes.stream()
                 .map(this::productProductAttributeToProductProductAttributeDTO)
                 .collect(Collectors.toList());
     }
 
+
     @Named("imagesToUrls")
     default List<String> imagesToUrls(List<ProductImage> images) {
+        if (images == null || images.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return images.stream()
-                .map(image -> "https://i.postimg.cc/" + image.getCode() + ".png")
+                .map(image -> "https://i.postimg.cc/" + image.getCode() + ".png") // Construiește manual URL-ul
                 .collect(Collectors.toList());
     }
+
+
+
 
     default ProductAttributeDTO productAttributeToDTO(ProductAttribute productAttribute) {
         ProductAttributeDTO dto = new ProductAttributeDTO();

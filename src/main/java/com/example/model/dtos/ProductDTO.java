@@ -1,4 +1,5 @@
 package com.example.model.dtos;
+import com.example.model.Category;
 import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -12,7 +13,7 @@ public class ProductDTO
     private float price;
     private int availableQuantity;
     private LocalDate addedDate;
-    private int categoryId;
+    private CategoryDTO category;
 //    private List<CartEntryDTO> cartEntries;
     private List<ProductProductAttributeDTO> productAttributeAttributeValues;
     private List<String> productImages;

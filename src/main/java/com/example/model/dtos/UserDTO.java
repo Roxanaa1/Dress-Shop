@@ -24,4 +24,6 @@ public class UserDTO
     private Boolean verifiedAccount = false;
     private String verificationCode;
     private LocalDateTime verificationCodeExpiration;
+    private String role;
+
 }

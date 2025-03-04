@@ -1,8 +1,6 @@
 package com.example.controller;
 
-import com.example.MessageResponse;
 import com.example.mapper.UserMapper;
-import com.example.model.Cart;
 import com.example.model.User;
 import com.example.model.dtos.AddressDTO;
 import com.example.model.dtos.UserDTO;
@@ -17,15 +15,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
 @CrossOrigin(origins = "http://localhost:3000")
-public class UserController
-{
+public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -33,15 +29,13 @@ public class UserController
     private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper,PasswordEncoder passwordEncoder,CartRepository cartRepository,UserRepository userRepository)
-    {
+    public UserController(UserService userService, UserMapper userMapper, PasswordEncoder passwordEncoder, CartRepository cartRepository, UserRepository userRepository) {
         this.userService = userService;
         this.userMapper = userMapper;
-        this.passwordEncoder=passwordEncoder;
-        this.cartRepository=cartRepository;
-        this.userRepository=userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
     }
-
 
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody UserDTO userDto) {
@@ -51,8 +45,9 @@ public class UserController
         return ResponseEntity.ok(createdUserDTO);
     }
 
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO userDto){
+    public ResponseEntity<?> login(@RequestBody UserDTO userDto) {
         User userToLogin = UserMapper.toEntity(userDto);
         User user = userService.login(userToLogin.getEmail(), userToLogin.getPassword());
         return ResponseEntity.ok(UserMapper.toDto(user));
@@ -66,14 +61,13 @@ public class UserController
             userService.verify(email, code);
             return ResponseEntity.ok("Cont verificat cu succes!");
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Verificarea a eșuat: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Verificarea a esuat: " + e.getMessage());
         }
     }
 
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<UserDTO> getUserData(@PathVariable int id)
-    {
+    public ResponseEntity<UserDTO> getUserData(@PathVariable int id) {
         Optional<User> user = userRepository.findById(id);
         return user.map(u -> ResponseEntity.ok(UserMapper.toDto(u)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -81,16 +75,14 @@ public class UserController
 
 
     @PutMapping("/user")
-    public ResponseEntity<User> updateUserData(@RequestBody User userData)
-    {
+    public ResponseEntity<User> updateUserData(@RequestBody User userData) {
 
         Optional<User> existingUserOptional = userRepository.findById(userData.getId());
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
 
 
-            if (!userData.getPassword().equals(existingUser.getPassword()))
-            {
+            if (!userData.getPassword().equals(existingUser.getPassword())) {
                 userData.setPassword(passwordEncoder.encode(userData.getPassword()));
             }
 
@@ -102,33 +94,28 @@ public class UserController
     }
 
     @PostMapping("/addresses/{userId}")
-    public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO, @PathVariable int userId)
-    {
-        if (userId == 0)
-        {
+    public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO, @PathVariable int userId) {
+        if (userId == 0) {
             throw new RuntimeException("Invalid user ID");
         }
 
         try {
             AddressDTO savedAddress = userService.addAddressToUser(addressDTO, userId);
             return ResponseEntity.ok(savedAddress);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping("/getUserById/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable int id)
-    {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
         Optional<User> user = userService.findUserById(id);
         return user.map(u -> ResponseEntity.ok(UserMapper.toDto(u)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/updateUser/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserDTO userDTO)
-    {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody UserDTO userDTO) {
         try {
             User userDetails = UserMapper.toEntity(userDTO);
             User updatedUser = userService.updateUser(userDetails, id);
@@ -142,8 +129,7 @@ public class UserController
     }
 
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id)
-    {
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
         try {
             userService.deleteUser(id);
             return ResponseEntity.ok().build();

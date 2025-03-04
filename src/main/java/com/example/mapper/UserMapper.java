@@ -1,8 +1,6 @@
 package com.example.mapper;
 
-import com.example.model.Cart;
-import com.example.model.Order;
-import com.example.model.User;
+import com.example.model.*;
 import com.example.model.dtos.UserDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -47,25 +45,34 @@ public interface UserMapper
         userDTO.setVerifiedAccount(user.getVerifiedAccount());
         userDTO.setVerificationCode(user.getVerificationCode());
         userDTO.setVerificationCodeExpiration(user.getVerificationCodeExpiration());
+        userDTO.setRole(user.getRole().getRoleType().name());
 
         return userDTO;
     }
 
 
     public static User toEntity(UserDTO userDTO) {
-            User user = new User();
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
-            user.setEmail(userDTO.getEmail());
-            user.setPhoneNumber(userDTO.getPhoneNumber());
-            user.setPassword(userDTO.getPassword());
-            user.setDefaultDeliveryAddress(userDTO.getDefaultDeliveryAddress());
-            user.setDefaultBillingAddress(userDTO.getDefaultBillingAddress());
-            // You can set other properties as needed
-            user.setVerifiedAccount(userDTO.getVerifiedAccount());
-            user.setVerificationCode(userDTO.getVerificationCode());
-            user.setVerificationCodeExpiration(userDTO.getVerificationCodeExpiration());
-            return user;
+        User user = new User();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setPassword(userDTO.getPassword());
+        user.setDefaultDeliveryAddress(userDTO.getDefaultDeliveryAddress());
+        user.setDefaultBillingAddress(userDTO.getDefaultBillingAddress());
+        user.setVerifiedAccount(userDTO.getVerifiedAccount());
+        user.setVerificationCode(userDTO.getVerificationCode());
+        user.setVerificationCodeExpiration(userDTO.getVerificationCodeExpiration());
+
+        if (userDTO.getRole() != null) {
+            Role role = new Role();
+            role.setRoleType(RoleType.valueOf(userDTO.getRole().toUpperCase()));
+            user.setRole(role);
         }
+
+        return user;
+    }
+
+
 
 }
