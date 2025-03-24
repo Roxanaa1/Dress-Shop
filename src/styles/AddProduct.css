@@ -9,7 +9,7 @@ body, html {
     width: 100%;
     height: 100%;
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    background-color: #F8EDE3;
 }
 
 
@@ -18,7 +18,8 @@ body, html {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f8f9fa;
+    padding-top: 40px;
+    background-color: #F8EDE3;
 }
 
 

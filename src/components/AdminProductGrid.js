@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import '../styles/AdminProductGrid.css';
+import '../styles/Wishlist.css';
 
 const AdminProductGrid = () => {
     const [products, setProducts] = useState([]);
@@ -37,35 +38,38 @@ const AdminProductGrid = () => {
     };
 
     return (
-        <Container className="wishlist-container">
-            <h2 className="my-4 text-center">Products Grid</h2>
+        <div className="admin-product-container">
             {error && <p className="text-danger text-center">{error}</p>}
-            <Row className="wishlist-grid">
+            <div className="admin-product-grid">
                 {products.map((product) => (
-                    <Col key={product.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
-                        <div className="wishlist-item">
+                    <div key={product.id} className="admin-product-grid-item">
+                        <div className="admin-product-item">
+                            <div className="admin-product-actions-top">
+                                <Link to={`/edit-product/${product.id}`} className="btn btn-warning btn-sm me-2">
+                                    <i className="fas fa-edit"></i>
+                                </Link>
+                                <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={() => handleDelete(product.id)}
+                                    title="Delete"
+                                >
+                                    <i className="fas fa-trash"></i>
+                                </button>
+                            </div>
                             <img
                                 src={product.productImages[0] || "https://via.placeholder.com/150"}
                                 alt={product.name}
-                                className="wishlist-image"
+                                className="admin-product-image"
                             />
-                            <div className="wishlist-details">
+                            <div className="admin-product-details">
                                 <h3>{product.name}</h3>
                                 <p><strong>{product.price} Lei</strong></p>
                             </div>
-                            <div className="d-flex justify-content-between">
-                                <Link to={`/edit-product/${product.id}`} className="btn btn-warning">
-                                    Edit
-                                </Link>
-                                <Button variant="danger" onClick={() => handleDelete(product.id)}>
-                                    Delete
-                                </Button>
-                            </div>
                         </div>
-                    </Col>
+                    </div>
                 ))}
-            </Row>
-        </Container>
+            </div>
+        </div>
     );
 };
 

@@ -40,20 +40,17 @@ function Login() {
             }
 
             console.log('Login response data:', data);
-            // Salvează datele utilizatorului în localStorage
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('cartId', data.cartId);
-            localStorage.setItem('role', data.role); // Stocăm rolul utilizatorului
-            localStorage.setItem('email', data.email); // Salvează și email-ul utilizatorului
-
+            localStorage.setItem('role', data.role);
+            localStorage.setItem('email', data.email);
             console.log('Login successful:', data);
             localStorage.setItem('userId', data.id);
 
             setSuccess('Login successful!');
             setError(null);
 
-            // Verifică rolul utilizatorului din localStorage
             const userRole = localStorage.getItem('role');
             const isLoggedIn = localStorage.getItem('isLoggedIn');
 

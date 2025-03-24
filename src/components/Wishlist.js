@@ -31,7 +31,6 @@ const Wishlist = () => {
                         price: item.productDTO?.price !== undefined ? `${item.productDTO.price} RON` : 'N/A',
                     }));
                     setWishlistItems(mappedItems);
-
                 } else {
                     setWishlistItems([]);
                 }
@@ -59,7 +58,7 @@ const Wishlist = () => {
             })
             .catch(error => {
                 console.error('Error removing item:', error);
-                alert('Eroare ');
+                alert('Eroare');
             });
     };
 
@@ -74,14 +73,24 @@ const Wishlist = () => {
                     <div className="wishlist-grid">
                         {wishlistItems.map(item => (
                             <div key={item.id} className="wishlist-item">
-                                <img src={item.image} alt={item.name} className="wishlist-image" onClick={() => handleProductClick(item.id)} />
+                                <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="wishlist-image"
+                                    onClick={() => handleProductClick(item.id)}
+                                />
                                 <div className="wishlist-details">
                                     <h3>{item.name}</h3>
                                     <p>{item.price}</p>
                                 </div>
-                                <button className="wishlist-remove-button" onClick={() => handleRemoveClick(item.id)}>
-                                    <i className="fas fa-trash"></i>
-                                </button>
+                                <div className="wishlist-actions">
+                                    <button
+                                        className="wishlist-remove-button"
+                                        onClick={() => handleRemoveClick(item.id)}
+                                    >
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>

@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items: center;
     background-color: rgba(167, 114, 125);
-    padding: 0;
+    padding: 5px 10px;
     color: #D0B8A8;
     width: 100%;
     position: fixed;
@@ -12,13 +12,12 @@
     z-index: 1000;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-
 body {
-    padding-top: 60px;
+    padding-top: 40px;
 }
 
 .navbar-brand {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
 }

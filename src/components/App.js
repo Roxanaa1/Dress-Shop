@@ -17,16 +17,22 @@ import Verify from "./Verify";
 import AdminDashboard from "./AdminDashboard";
 import AddProduct from "./AddProduct";
 import AdminProductGrid from "./AdminProductGrid";
+import AdminNavbar from "./AdminNavbar";
 const AppContent = () => {
     const location = useLocation();
-    const showNavbar = !['/login', '/register', '/verify', '/admin-dashboard'].includes(location.pathname);
 
+    const isAdminRoute = location.pathname.startsWith('/admin');
+
+    const showUserNavbar = !isAdminRoute && !['/login', '/register', '/verify'].includes(location.pathname);
 
     return (
         <div className="App">
-            {showNavbar && <Navbar />}
+            {showUserNavbar && <Navbar />}
+            {isAdminRoute && <AdminNavbar />}
+
             <Routes>
                 <Route path="/" element={<UserDashboard />} />
+                <Route path="/user-dashboard" element={<UserDashboard />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/ProductDetails/:id" element={<ProductDetails />} />
@@ -35,14 +41,15 @@ const AppContent = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/search" element={<Search />} />
-                <Route path="/address" element={<Address/>} />
+                <Route path="/address" element={<Address />} />
                 <Route path="/sidebar" element={<Sidebar />} />
                 <Route path="/forgotPassword" element={<ForgotPassword />} />
                 <Route path="/orderSuccess" element={<OrderSuccess />} />
                 <Route path="/verify" element={<Verify />} />
+
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                <Route path="/user-dashboard" element={<UserDashboard />} />
                 <Route path="/add-product" element={<AddProduct />} />
+                <Route path="/edit-product/:id" element={<AddProduct />} />
                 <Route path="/admin-product-grid" element={<AdminProductGrid />} />
 
                 <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
