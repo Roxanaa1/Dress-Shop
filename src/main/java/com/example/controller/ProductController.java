@@ -81,6 +81,11 @@ public class ProductController {
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable int id, @RequestBody ProductDTO productDTO) {
         try {
             Product productDetails = productMapper.productDTOToProduct(productDTO);
+
+            if (productDTO.getProductImages() != null && !productDTO.getProductImages().isEmpty()) {
+                productDetails.setProductImages(productMapper.mapCodesToImages(productDTO.getProductImages(), productDetails));
+            }
+
             Product updatedProduct = productService.updateProduct(id, productDetails);
             ProductDTO updatedProductDTO = productMapper.productToProductDTO(updatedProduct);
             return ResponseEntity.ok(updatedProductDTO);

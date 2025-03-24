@@ -16,6 +16,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,10 +65,10 @@ public class ProductService
     {
         return productRepository.findById(id);
     }
-    public Product updateProduct(int id,Product productDetails)
-    {
-        return productRepository.findById(id).map(product ->
-        {
+    @Transactional
+    public Product updateProduct(int id, Product productDetails) {
+        return productRepository.findById(id).map(product -> {
+
             if (productDetails.getName() != null) {
                 product.setName(productDetails.getName());
             }
@@ -83,15 +84,33 @@ public class ProductService
             if (productDetails.getAddedDate() != null) {
                 product.setAddedDate(productDetails.getAddedDate());
             }
+
             if (productDetails.getCategory() != null) {
-                product.setCategory(productDetails.getCategory());
+                Category category = productDetails.getCategory();
+                Category existingCategory = categoryRepository.findByName(category.getName());
+
+                if (existingCategory == null) {
+                    existingCategory = categoryRepository.save(category);
+                }
+
+                product.setCategory(existingCategory);
             }
 
-            return  productRepository.save(product);
+            if (productDetails.getProductImages() != null && !productDetails.getProductImages().isEmpty()) {
+                productImageRepository.deleteByProductId(product.getId());
+
+                for (ProductImage imageObj : productDetails.getProductImages()) {
+                    ProductImage image = new ProductImage();
+                    image.setCode(imageObj.getCode());
+                    image.setProduct(product);
+                    productImageRepository.save(image);
+                }
+            }
+
+            return productRepository.save(product);
 
         }).orElseThrow(() -> new EntityNotFoundException("Product not found with id:" + id));
     }
-
 
     public void deleteProduct(int id)
     {

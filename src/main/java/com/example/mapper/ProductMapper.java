@@ -71,4 +71,15 @@ public interface ProductMapper {
         dto.setName(productAttribute.getName());
         return dto;
     }
+    default List<ProductImage> mapCodesToImages(List<String> codes, Product product) {
+        if (codes == null) return Collections.emptyList();
+
+        return codes.stream().map(code -> {
+            ProductImage img = new ProductImage();
+            img.setCode(code);
+            img.setProduct(product);
+            return img;
+        }).collect(Collectors.toList());
+    }
+
 }

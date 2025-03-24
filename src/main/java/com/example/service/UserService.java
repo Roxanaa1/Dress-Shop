@@ -21,6 +21,7 @@ public class UserService
 {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final CartRepository cartRepository;
     private final PasswordEncoder passwordEncoder;
     private final AddressMapper addressMapper;
     private final AddressRepository addressRepository;
@@ -28,7 +29,7 @@ public class UserService
     private final RoleRepository roleRepository;
     private final ProductImageRepository productImageRepository;
     @Autowired
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository,EmailService emailService,RoleRepository roleRepository,ProductRepository productRepository,ProductImageRepository productImageRepository)
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository,EmailService emailService,RoleRepository roleRepository,ProductRepository productRepository,ProductImageRepository productImageRepository,CartRepository cartRepository)
     {
         this.userRepository=userRepository;
         this.passwordEncoder=passwordEncoder;
@@ -38,7 +39,7 @@ public class UserService
         this.roleRepository=roleRepository;
         this.productRepository=productRepository;
         this.productImageRepository=productImageRepository;
-
+        this.cartRepository=cartRepository;
     }
 
     public User create(User user) {
@@ -60,6 +61,10 @@ public class UserService
         user.setVerifiedAccount(false);
 
         User savedUser = userRepository.save(user);
+        Cart cart = new Cart();
+        cart.setUser(savedUser);
+        cart.setTotalPrice(0);
+        cartRepository.save(cart);
         emailService.sendVerificationEmail(user.getEmail(), verificationCode);
         return savedUser;
     }
