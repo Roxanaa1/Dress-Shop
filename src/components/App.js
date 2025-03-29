@@ -18,6 +18,8 @@ import AdminDashboard from "./AdminDashboard";
 import AddProduct from "./AddProduct";
 import AdminProductGrid from "./AdminProductGrid";
 import AdminNavbar from "./AdminNavbar";
+import Orders from "./Orders";
+import UserCharts from "./UserCharts";
 const AppContent = () => {
     const location = useLocation();
 
@@ -51,7 +53,8 @@ const AppContent = () => {
                 <Route path="/add-product" element={<AddProduct />} />
                 <Route path="/edit-product/:id" element={<AddProduct />} />
                 <Route path="/admin-product-grid" element={<AdminProductGrid />} />
-
+                <Route path="/admin-orders" element={<Orders />} />
+                <Route path="/admin-charts/users" element={<UserCharts />} />
                 <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
             </Routes>
         </div>

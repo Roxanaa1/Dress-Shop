@@ -19,10 +19,9 @@ body.register-page {
     min-height: 100vh;
     background-image: url('/public/images/register.jpg');
     background-size: cover;
-    background-position: center center;
+    background-position: center;
     background-repeat: no-repeat;
 }
-
 .register-background {
     width: 100%;
     height: 100%;

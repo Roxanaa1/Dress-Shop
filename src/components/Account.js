@@ -9,17 +9,18 @@ const Account = () => {
         email: '',
         firstName: '',
         lastName: '',
-        phoneNumber: '',
-        password: ''
+        phoneNumber: ''
     });
     const [error, setError] = useState(null);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const navigate = useNavigate();
     const role = localStorage.getItem("role");
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            console.error('No user ID found, redirecting to login');
             navigate('/login');
             return;
         }
@@ -34,14 +35,11 @@ const Account = () => {
                 });
                 const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(data.message || 'Failed to fetch user data.');
-                }
-
+                if (!response.ok) throw new Error(data.message || 'Failed to fetch user data.');
                 setUser(data);
             } catch (err) {
                 setError(err.message);
-                console.error('Failed to fetch user data:', err);
+                console.error('Fetch error:', err);
             }
         };
 
@@ -50,44 +48,65 @@ const Account = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setUser(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        setUser(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSaveProfile = async () => {
         const userId = localStorage.getItem('userId');
-        if (!userId) {
-            console.error('No user ID found, cannot save data');
-            return;
-        }
+        if (!userId) return;
 
         try {
             const response = await fetch(`http://localhost:8080/users/user`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user)
             });
+
             const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to update user data.');
-            }
-
-            console.log('Updated user data:', data);
+            if (!response.ok) throw new Error(data.message || 'Failed to update user.');
+            alert("Datele au fost actualizate cu succes!");
         } catch (err) {
-            setError(err.message);
-            console.error('Failed to update user data:', err);
+            alert(err.message);
+        }
+    };
+
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+
+        if (newPassword !== confirmPassword) {
+            alert("Parolele noi nu coincid.");
+            return;
+        }
+
+        const userId = localStorage.getItem("userId");
+
+        try {
+            const response = await fetch(`http://localhost:8080/users/changePassword/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    oldPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            });
+
+            if (response.ok) {
+                alert("Parola a fost schimbată cu succes!");
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+            } else {
+                const data = await response.text();
+                alert(data || "Eroare la schimbarea parolei.");
+            }
+        } catch (err) {
+            alert("Eroare la schimbarea parolei.");
+            console.error(err);
         }
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('role');
+        localStorage.clear();
         navigate('/login');
     };
 
@@ -106,6 +125,7 @@ const Account = () => {
                 <div className="content">
                     <div className="personal-data-container">
                         <h2>PERSONAL DATA</h2>
+
                         <div className="personal-info">
                             <h3>Identification Data</h3>
                             <label>Email</label>
@@ -116,15 +136,34 @@ const Account = () => {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </div>
 
-                            <label>Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleInputChange}
-                                required
-                            />
+                        <div className="personal-info">
+                            <h3>Change Password</h3>
+                            <form onSubmit={handleChangePassword}>
+                                <label>Current Password</label>
+                                <input
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    required
+                                />
+                                <label>New Password</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                />
+                                <label>Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    required
+                                />
+                                <button type="submit">Change Password</button>
+                            </form>
                         </div>
 
                         <div className="personal-info">
@@ -137,7 +176,6 @@ const Account = () => {
                                 onChange={handleInputChange}
                                 required
                             />
-
                             <label>Last Name</label>
                             <input
                                 type="text"
@@ -146,7 +184,6 @@ const Account = () => {
                                 onChange={handleInputChange}
                                 required
                             />
-
                             <label>Phone Number</label>
                             <input
                                 type="text"

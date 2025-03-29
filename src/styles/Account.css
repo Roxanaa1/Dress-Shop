@@ -1,10 +1,11 @@
 .account-container {
     display: flex;
     width: 100%;
-    height: 100vh;
-    margin-top: 35px;
     font-family: 'Mate', serif;
     background-color: #F8EDE3;
+    margin-top: 30px;
+    height: calc(100vh - 100px);
+    overflow: hidden;
 }
 
 .sidebar {
@@ -14,6 +15,9 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    position: sticky;
+    top: 100px;
+    height: calc(100vh - 100px);
 }
 
 .sidebar-button {
@@ -29,16 +33,16 @@
     border-radius: 4px;
 }
 
+/* Conținut scrollabil */
 .content {
     flex-grow: 1;
     padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow-y: auto;
+    height: calc(100vh - 100px);
 }
 
 .personal-data-container {
-    max-width: 500px;
+    max-width: 600px;
     width: 100%;
     margin: 0 auto;
     padding: 20px;
@@ -72,16 +76,19 @@ label {
     color: #666;
 }
 
-input {
+input,
+form input {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    box-sizing: border-box;
 }
 
-button {
+button,
+form button {
     width: 100%;
     padding: 10px;
     background-color: #A7727D;
@@ -90,4 +97,9 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+}
+.personal-info * {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }

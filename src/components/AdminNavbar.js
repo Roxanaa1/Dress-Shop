@@ -24,7 +24,14 @@ const AdminNavbar = () => {
         <header className="navbar">
             <div className="navbar-left">
                 <button onClick={() => navigate('/admin-dashboard')} className="home-button">HOME</button>
-                <button onClick={() => navigate('/add-product')} className="create-product-button">CREATE PRODUCT</button>
+                <button onClick={() => navigate('/admin-orders')} className="orders-button">ORDERS</button>
+                <button onClick={() => navigate('/add-product')} className="create-product-button">CREATE PRODUCT
+                </button>
+                <button onClick={() => navigate('/admin-charts/users')} className="charts-button">USER CHARTS</button>
+                <button onClick={() => navigate('/admin-charts/products')} className="charts-button">PRODUCT CHARTS
+                </button>
+                <button onClick={() => navigate('/admin-charts/orders')} className="charts-button">ORDER CHARTS</button>
+
             </div>
 
             <div className="navbar-icons">

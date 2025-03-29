@@ -9,23 +9,29 @@ function Register() {
         email: '',
         phoneNumber: '',
         password: '',
-        role: 'USER' // Setare implicită
+        birthDate: '',
+        role: 'USER'
     });
 
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        document.body.classList.add('register-page');
-        return () => {
-            document.body.classList.remove('register-page');
-        };
-    }, []);
-
     const handleInputChange = (e) => {
         setUserData({ ...userData, [e.target.name]: e.target.value });
     };
+
+    useEffect(() => {
+        document.body.classList.add('register-page');
+        document.documentElement.classList.add('register-page');
+        document.getElementById('root')?.classList.add('register-page');
+
+        return () => {
+            document.body.classList.remove('register-page');
+            document.documentElement.classList.remove('register-page');
+            document.getElementById('root')?.classList.remove('register-page');
+        };
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,10 +51,9 @@ function Register() {
             setSuccess('Te rugăm să-ți verifici emailul pentru a finaliza procesul de înregistrare.');
             setError(null);
 
-            // Salvăm datele utilizatorului în localStorage
             localStorage.setItem('email', userData.email);
             localStorage.setItem('role', userData.role);
-            localStorage.setItem('isLoggedIn', 'true'); // Dacă utilizatorul este logat automat după înregistrare
+            localStorage.setItem('isLoggedIn', 'true');
 
             navigate(`/verify?email=${userData.email}`);
         } catch (err) {
@@ -102,6 +107,17 @@ function Register() {
                             id="phoneNumber"
                             name="phoneNumber"
                             value={userData.phoneNumber}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="birthDate">Date of Birth:</label>
+                        <input
+                            type="date"
+                            id="birthDate"
+                            name="birthDate"
+                            value={userData.birthDate}
                             onChange={handleInputChange}
                             required
                         />
