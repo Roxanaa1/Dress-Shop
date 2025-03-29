@@ -1,14 +1,16 @@
 package com.example.mapper;
+
 import com.example.model.*;
 import com.example.model.dtos.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.w3c.dom.Attr;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
     @Mapping(source = "category", target = "category")
@@ -65,14 +67,13 @@ public interface ProductMapper {
     }
 
 
-
-
     default ProductAttributeDTO productAttributeToDTO(ProductAttribute productAttribute) {
         ProductAttributeDTO dto = new ProductAttributeDTO();
         dto.setId(productAttribute.getId());
         dto.setName(productAttribute.getName());
         return dto;
     }
+
     default List<ProductImage> mapCodesToImages(List<String> codes, Product product) {
         if (codes == null) return Collections.emptyList();
 
@@ -84,4 +85,53 @@ public interface ProductMapper {
         }).collect(Collectors.toList());
     }
 
+    default Product productDTOToProductManual(ProductDTO dto) {
+        Product product = new Product();
+        product.setId(dto.getId());
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setAvailableQuantity(dto.getAvailableQuantity());
+        product.setAddedDate(dto.getAddedDate());
+        product.setBuyingPrice(dto.getBuyingPrice());
+
+        if (dto.getCategory() != null) {
+            Category category = new Category();
+            category.setName(dto.getCategory().getName());
+            category.setDescription(dto.getCategory().getDescription());
+            product.setCategory(category);
+        }
+
+        if (dto.getProductImages() != null) {
+            List<ProductImage> images = dto.getProductImages().stream().map(code -> {
+                ProductImage img = new ProductImage();
+                img.setCode(code);
+                img.setProduct(product);
+                return img;
+            }).toList();
+            product.setProductImages(images);
+        }
+
+        if (dto.getAttributes() != null) {
+            List<ProductProductAttribute> links = new ArrayList<>();
+            for (AttributeWithValuesDTO attr : dto.getAttributes()) {
+                for (String val : attr.getValues()) {
+                    ProductAttribute pa = new ProductAttribute();
+                    pa.setName(attr.getAttributeName());
+
+                    AttributeValue av = new AttributeValue();
+                    av.setValue(val);
+
+                    ProductProductAttribute ppa = new ProductProductAttribute();
+                    ppa.setProduct(product);
+                    ppa.setProductAttribute(pa);
+                    ppa.setAttributeValue(av);
+
+                    links.add(ppa);
+                }
+            }
+            product.setProductAttributeAttributeValues(links);
+        }
+        return product;
+    }
 }

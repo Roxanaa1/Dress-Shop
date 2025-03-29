@@ -1,12 +1,8 @@
 package com.example.service;
 
 import com.example.mapper.ProductMapper;
-import com.example.model.Category;
-import com.example.model.Product;
-import com.example.model.ProductImage;
-import com.example.repository.CategoryRepository;
-import com.example.repository.ProductImageRepository;
-import com.example.repository.ProductRepository;
+import com.example.model.*;
+import com.example.repository.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -18,31 +14,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 @Service
-public class ProductService
-{
+public class ProductService {
     @PersistenceContext
-    private EntityManager entityManager;//pt search
+    private EntityManager entityManager;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
-    @Autowired
-    public ProductService(ProductRepository productRepository,ProductMapper productMapper,ProductImageRepository productImageRepository,CategoryRepository categoryRepository)
-    {
-        this.productRepository=productRepository;
-        this.productMapper=productMapper;
-        this.productImageRepository=productImageRepository;
-        this.categoryRepository=categoryRepository;
+    private final ProductAttributeRepository productAttributeRepository;
+    private final AttributeValueRepository attributeValueRepository;
 
+    @Autowired
+    public ProductService(ProductRepository productRepository,
+                          ProductMapper productMapper,
+                          ProductImageRepository productImageRepository,
+                          CategoryRepository categoryRepository,
+                          ProductAttributeRepository productAttributeRepository,
+                          AttributeValueRepository attributeValueRepository) {
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+        this.productImageRepository = productImageRepository;
+        this.categoryRepository = categoryRepository;
+        this.productAttributeRepository = productAttributeRepository;
+        this.attributeValueRepository = attributeValueRepository;
     }
 
-    public Product addProduct(Product product)
-    {
-
+    @Transactional
+    public Product addProduct(Product product) {
         if (product.getCategory() == null || product.getCategory().getName() == null) {
             throw new IllegalArgumentException("Produsul trebuie sa aiba o categorie valida");
         }
@@ -53,18 +54,60 @@ public class ProductService
         if (existingCategory == null) {
             existingCategory = categoryRepository.save(category);
         }
-
         product.setCategory(existingCategory);
+
+        if (product.getProductAttributeAttributeValues() != null) {
+            for (ProductProductAttribute ppa : product.getProductAttributeAttributeValues()) {
+
+                String attributeName = ppa.getProductAttribute().getName();
+                ProductAttribute attribute = productAttributeRepository.findByName(attributeName)
+                        .orElseGet(() -> productAttributeRepository.save(new ProductAttribute(attributeName)));
+                ppa.setProductAttribute(attribute);
+
+                String value = ppa.getAttributeValue().getValue();
+                AttributeValue existingValue = attributeValueRepository.findByValue(value);
+                if (existingValue == null) {
+                    existingValue = attributeValueRepository.save(ppa.getAttributeValue());
+                }
+                ppa.setAttributeValue(existingValue);
+
+                ppa.setProduct(product);
+            }
+        }
 
         return productRepository.save(product);
     }
 
 
-
-    public Optional<Product> getProductById(int id)
-    {
+    public Optional<Product> getProductById(int id) {
         return productRepository.findById(id);
     }
+
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    public List<Product> getProductsByCategory(String category) {
+        return productRepository.findByCategoryNameIgnoreCase(category);
+    }
+
+    public List<Product> searchProducts(String query) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Product> cq = cb.createQuery(Product.class);
+        Root<Product> product = cq.from(Product.class);
+
+        String[] keywords = query.split("\\s+");
+        List<Predicate> predicates = new ArrayList<>();
+
+        for (String keyword : keywords) {
+            predicates.add(cb.like(cb.upper(product.get("name")), "%" + keyword.toUpperCase() + "%"));
+        }
+
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        return entityManager.createQuery(cq).getResultList();
+    }
+
     @Transactional
     public Product updateProduct(int id, Product productDetails) {
         return productRepository.findById(id).map(product -> {
@@ -92,7 +135,6 @@ public class ProductService
                 if (existingCategory == null) {
                     existingCategory = categoryRepository.save(category);
                 }
-
                 product.setCategory(existingCategory);
             }
 
@@ -112,55 +154,11 @@ public class ProductService
         }).orElseThrow(() -> new EntityNotFoundException("Product not found with id:" + id));
     }
 
-    public void deleteProduct(int id)
-    {
-        if(productRepository.existsById(id))
-        {
+    public void deleteProduct(int id) {
+        if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Product not found with id :" + id);
         }
-        else
-        {
-            throw new RuntimeException("Product not found with id :"+id);
-        }
-    }
-
-    public List<Product> findAll()
-    {
-        return productRepository.findAll();
-    }
-
-    public List<Product> getProductsByCategory(String category)
-    {
-        List<Product> products = productRepository.findByCategoryNameIgnoreCase(category);
-        return products;
-    }
-
-    public List<Product> searchProducts(String query)
-    {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Product> cq = cb.createQuery(Product.class);
-        Root<Product> product = cq.from(Product.class);
-
-        String[] keywords = query.split("\\s+");
-        List<Predicate> predicates = new ArrayList<>();
-
-        for (String keyword : keywords)
-        {
-            predicates.add(cb.like(cb.upper(product.get("name")), "%" + keyword.toUpperCase() + "%"));
-        }
-
-        cq.where(cb.and(predicates.toArray(new Predicate[0])));
-
-        return entityManager.createQuery(cq).getResultList();
-    }
-    public void addImageToProduct(int productId, String imageCode) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        ProductImage image = new ProductImage();
-        image.setProduct(product);
-        image.setCode(imageCode);
-
-        productImageRepository.save(image);
     }
 }

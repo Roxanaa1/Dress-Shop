@@ -22,4 +22,7 @@ public class ProductAttribute {
     @Column(nullable = false)
     private String name;
 
+    public ProductAttribute(String name) {
+        this.name = name;
+    }
 }

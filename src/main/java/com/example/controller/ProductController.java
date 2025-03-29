@@ -32,6 +32,20 @@ public class ProductController {
         this.userService = userService;
     }
 
+    @PostMapping("/addProduct")
+    public ResponseEntity<?> addProduct(@RequestBody ProductDTO productDTO, @RequestParam int userId) {
+        User user = userService.getUserById(userId);
+        if (user.getRole().getId() != 2) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied.");
+        }
+
+        Product product = productMapper.productDTOToProductManual(productDTO);
+        Product savedProduct = productService.addProduct(product);
+
+        ProductDTO savedProductDTO = productMapper.productToProductDTO(savedProduct);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDTO);
+    }
 
     @GetMapping("/search")
     public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String query) {
@@ -43,57 +57,6 @@ public class ProductController {
                 .map(productMapper::productToProductDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
-    }
-
-    @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@RequestBody ProductDTO productDTO, @RequestParam int userId) {
-        User user = userService.getUserById(userId);
-        if (user.getRole().getId() != 2) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied.");
-        }
-
-        Product product = productMapper.productDTOToProduct(productDTO);
-        Product savedProduct = productService.addProduct(product);
-
-        if (productDTO.getProductImages() != null && !productDTO.getProductImages().isEmpty()) {
-            for (String imageCode : productDTO.getProductImages()) {
-              productService.addImageToProduct(savedProduct.getId(), imageCode);
-            }
-        }
-
-        ProductDTO savedProductDTO = productMapper.productToProductDTO(savedProduct);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDTO);
-    }
-
-
-    @DeleteMapping("/deleteProduct/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
-        try {
-            productService.deleteProduct(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PutMapping("/updateProduct/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable int id, @RequestBody ProductDTO productDTO) {
-        try {
-            Product productDetails = productMapper.productDTOToProduct(productDTO);
-
-            if (productDTO.getProductImages() != null && !productDTO.getProductImages().isEmpty()) {
-                productDetails.setProductImages(productMapper.mapCodesToImages(productDTO.getProductImages(), productDetails));
-            }
-
-            Product updatedProduct = productService.updateProduct(id, productDetails);
-            ProductDTO updatedProductDTO = productMapper.productToProductDTO(updatedProduct);
-            return ResponseEntity.ok(updatedProductDTO);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     @GetMapping("/getAllProducts")
@@ -120,5 +83,35 @@ public class ProductController {
                 .map(productMapper::productToProductDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
+    }
+
+
+    @PutMapping("/updateProduct/{id}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable int id, @RequestBody ProductDTO productDTO) {
+        try {
+            Product productDetails = productMapper.productDTOToProduct(productDTO);
+
+            if (productDTO.getProductImages() != null && !productDTO.getProductImages().isEmpty()) {
+                productDetails.setProductImages(productMapper.mapCodesToImages(productDTO.getProductImages(), productDetails));
+            }
+
+            Product updatedProduct = productService.updateProduct(id, productDetails);
+            ProductDTO updatedProductDTO = productMapper.productToProductDTO(updatedProduct);
+            return ResponseEntity.ok(updatedProductDTO);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/deleteProduct/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
