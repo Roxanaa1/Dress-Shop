@@ -10,11 +10,16 @@ const AddProduct = () => {
         description: '',
         price: '',
         availableQuantity: '',
+        buyingPrice: '',
         category: '',
+        categoryDescription: '',
         productImages: [],
     });
 
-    const [imageName, setImageName] = useState('');
+    const [attributes, setAttributes] = useState([
+        { attributeName: '', values: [''] }
+    ]);
+
     const navigate = useNavigate();
     const role = localStorage.getItem("role")?.toLowerCase();
     const { id } = useParams();
@@ -25,7 +30,6 @@ const AddProduct = () => {
                 try {
                     const response = await fetch(`http://localhost:8080/products/getProductById/${id}`);
                     if (!response.ok) throw new Error("Failed to fetch product");
-
                     const data = await response.json();
 
                     setProduct({
@@ -33,11 +37,13 @@ const AddProduct = () => {
                         description: data.description || '',
                         price: data.price || '',
                         availableQuantity: data.availableQuantity || '',
+                        buyingPrice: data.buyingPrice || '',
                         category: data.category?.name || '',
-                        productImages: data.productImages || [],
+                        categoryDescription: data.category?.description || '',
+                        productImages: data.productImages?.map(img =>
+                            img.replace("https://i.postimg.cc/", "").replace(".png", "")
+                        ) || [],
                     });
-
-                    setImageName(data.productImages?.[0] || '');
                 } catch (error) {
                     console.error("Error loading product:", error);
                 }
@@ -52,20 +58,41 @@ const AddProduct = () => {
     };
 
     const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        if (selectedImage) {
-            let imageNameWithoutExtension = selectedImage.name.replace(/\.[^/.]+$/, "");
-
-            if (imageNameWithoutExtension.length > 8) {
-                imageNameWithoutExtension = imageNameWithoutExtension.slice(0, 8) + '/' + imageNameWithoutExtension.slice(8);
+        const files = Array.from(e.target.files);
+        const imageNames = files.map(file => {
+            let name = file.name.replace(/\.[^/.]+$/, "");
+            if (name.length > 8) {
+                name = name.slice(0, 8) + '/' + name.slice(8);
             }
+            return name;
+        });
 
-            setImageName(imageNameWithoutExtension);
-            setProduct((prevState) => ({
-                ...prevState,
-                productImages: [imageNameWithoutExtension],
-            }));
-        }
+        setProduct(prev => ({
+            ...prev,
+            productImages: [...prev.productImages, ...imageNames]
+        }));
+    };
+
+    const handleAttributeChange = (index, key, value) => {
+        const updated = [...attributes];
+        updated[index][key] = value;
+        setAttributes(updated);
+    };
+
+    const handleValueChange = (attrIndex, valIndex, value) => {
+        const updated = [...attributes];
+        updated[attrIndex].values[valIndex] = value;
+        setAttributes(updated);
+    };
+
+    const addAttribute = () => {
+        setAttributes([...attributes, { attributeName: '', values: [''] }]);
+    };
+
+    const addValueToAttribute = (attrIndex) => {
+        const updated = [...attributes];
+        updated[attrIndex].values.push('');
+        setAttributes(updated);
     };
 
     const handleSubmit = async (e) => {
@@ -73,7 +100,7 @@ const AddProduct = () => {
         const userId = localStorage.getItem('userId');
 
         if (!userId || isNaN(userId)) {
-            alert('User ID is not valid! Please log in again.');
+            alert('Invalid user ID! Please log in again.');
             return;
         }
 
@@ -88,8 +115,14 @@ const AddProduct = () => {
             description: product.description,
             price: product.price,
             availableQuantity: product.availableQuantity,
-            category: { name: product.category },
+            buyingPrice: product.buyingPrice,
+            addedDate: new Date().toISOString().split('T')[0],
+            category: {
+                name: product.category,
+                description: product.categoryDescription
+            },
             productImages: product.productImages,
+            attributes: attributes
         };
 
         const url = id
@@ -107,74 +140,70 @@ const AddProduct = () => {
                 body: JSON.stringify(productData),
             });
 
-            if (!response.ok) {
-                throw new Error(id ? 'Failed to update product' : 'Failed to add product');
-            }
+            if (!response.ok) throw new Error(id ? 'Failed to update product' : 'Failed to add product');
 
             await response.json();
 
-            alert(id ? 'Produs actualizat cu succes!' : 'Produs adăugat cu succes!');
+            alert(id ? 'Product updated successfully!' : 'Product added successfully!');
             navigate('/admin-dashboard');
 
         } catch (error) {
             console.error("Error submitting product:", error);
-            alert(id ? 'Eroare la actualizarea produsului' : 'Eroare la adăugarea produsului');
+            alert(id ? 'Error updating product' : 'Error adding product');
         }
+        console.log("ProductData to be sent:", productData);
+
     };
 
     return (
         <div>
             {role === "admin" ? <AdminNavbar /> : <Navbar />}
-
             <div className="add-product-container">
                 <div className="add-product-form">
-                    <h2>{id ? "Editează Produs" : "Adaugă Produs"}</h2>
+                    <h2>{id ? "Edit Product" : "Add Product"}</h2>
                     <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Nume produs"
-                            value={product.name}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="text"
-                            name="description"
-                            placeholder="Descriere"
-                            value={product.description}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="number"
-                            name="price"
-                            placeholder="Preț"
-                            value={product.price}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="number"
-                            name="availableQuantity"
-                            placeholder="Cantitate"
-                            value={product.availableQuantity}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="text"
-                            name="category"
-                            placeholder="Categorie"
-                            value={product.category}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="file"
-                            onChange={handleImageChange}
-                        />
-                        <button type="submit">{id ? "Salvează modificările" : "Adaugă produs"}</button>
+                        <input type="text" name="name" placeholder="Product Name" value={product.name} onChange={handleInputChange} required />
+                        <input type="text" name="description" placeholder="Description" value={product.description} onChange={handleInputChange} required />
+                        <input type="number" name="price" placeholder="Selling Price" value={product.price} onChange={handleInputChange} required />
+                        <input type="number" name="availableQuantity" placeholder="Stock Quantity" value={product.availableQuantity} onChange={handleInputChange} required />
+                        <input type="number" name="buyingPrice" placeholder="Buying Price" value={product.buyingPrice} onChange={handleInputChange} required />
+                        <input type="text" name="category" placeholder="Category Name" value={product.category} onChange={handleInputChange} required />
+                        <input type="text" name="categoryDescription" placeholder="Category Description (optional)" value={product.categoryDescription} onChange={handleInputChange} />
+
+                        <input type="file" multiple onChange={handleImageChange} />
+                        <ul>
+                            {product.productImages.map((img, index) => (
+                                <li key={index}>{img}</li>
+                            ))}
+                        </ul>
+
+                        {attributes.map((attr, attrIndex) => (
+                            <div key={attrIndex} className="attribute-section">
+                                <input
+                                    type="text"
+                                    placeholder="Attribute name (e.g. Size)"
+                                    value={attr.attributeName}
+                                    onChange={(e) => handleAttributeChange(attrIndex, 'attributeName', e.target.value)}
+                                />
+                                {attr.values.map((val, valIndex) => (
+                                    <input
+                                        key={valIndex}
+                                        type="text"
+                                        placeholder="Attribute value (e.g. S, M, L)"
+                                        value={val}
+                                        onChange={(e) => handleValueChange(attrIndex, valIndex, e.target.value)}
+                                    />
+                                ))}
+                                <div className="attribute-buttons">
+                                    <button type="button" onClick={() => addValueToAttribute(attrIndex)}>Add Value</button>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="attribute-buttons">
+                            <button type="button" onClick={addAttribute}>Add Attribute</button>
+                        </div>
+
+                        <button type="submit">{id ? "Save Changes" : "Add Product"}</button>
                     </form>
                 </div>
             </div>

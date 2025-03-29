@@ -3,26 +3,20 @@ import { useParams } from 'react-router-dom';
 import '../styles/ProductDetails.css';
 import Navbar from './Navbar';
 
-const ProductDetails = () =>
-{
+const ProductDetails = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [selectedImage, setSelectedImage] = useState('');
 
     useEffect(() => {
-        // Fetch detalii produs
         fetch(`http://localhost:8080/products/getProductById/${id}`)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
             .then(data => {
-                console.log('Product data:', data);
                 setProduct(data);
                 setSelectedImage(data.productImages[0]);
-
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
@@ -34,66 +28,36 @@ const ProductDetails = () =>
     const colorAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color');
     const sizeAttribute = product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size');
 
-    console.log(colorAttribute);
-    console.log(sizeAttribute); 
-
     const handleAddToCart = () => {
         const cartId = localStorage.getItem('cartId');
-        console.log("Cart ID:", cartId);
-
-
-        if (!cartId)
-        {
+        if (!cartId || !product?.id) {
             alert("Trebuie sa fii logat pentru a adauga produse in cos.");
             return;
         }
 
-        if (!product || !product.id)
-        {
-            alert("Eroare");
-            return;
-        }
-
-
-        const productDTO =
-            {
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            availableQuantity: product.availableQuantity,
-        };
-
-        const cartEntryDTO =
-            {
-            product: productDTO,
+        const cartEntryDTO = {
+            product: {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                availableQuantity: product.availableQuantity,
+            },
             quantity: 1,
             pricePerPiece: product.price,
             totalPricePerEntry: product.price * 1,
         };
 
-        console.log(cartEntryDTO);
-
         fetch(`http://localhost:8080/cart/addToCart/${cartId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(cartEntryDTO),
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error');
-                }
+                if (!response.ok) throw new Error('Error');
                 return response.json();
             })
-            .then(data => {
-                console.log('Product added to cart:', data);
-                alert('Produsul a fost adaugat in cosul de cumparaturi!');
-            })
-            .catch(error => {
-                console.error('Eroare:', error);
-                alert('Eroare');
-            });
+            .then(() => alert('Produsul a fost adaugat in cos!'))
+            .catch(() => alert('Eroare'));
     };
 
     const handleAddToWishlist = () => {
@@ -105,34 +69,25 @@ const ProductDetails = () =>
 
         fetch(`http://localhost:8080/wishlist/add/${userId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId: product.id }),
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error');
-                }
+                if (!response.ok) throw new Error('Error');
                 return response.json();
             })
-            .then(data => {
-                alert('Produsul a fost adaugat in wishlist!');
-            })
-            .catch(error => {
-                console.error('Eroare:', error);
-                alert('Eroare');
-            });
+            .then(() => alert('Produsul a fost adaugat in wishlist!'))
+            .catch(() => alert('Eroare'));
     };
 
     return (
         <div className="ProductDetails">
             <Navbar />
             <div className="details-container">
-                <div className="image-gallery">
-                    {selectedImage && <img src={selectedImage} alt={product.name} className="main-image" />}
-                    <div className="thumbnail-gallery">
-                        {product.productImages && product.productImages.map((image, index) => (
+                <div className="image-details-wrapper">
+                    <img src={selectedImage} alt={product.name} className="main-image" />
+                    <div className="thumbnail-gallery-vertical">
+                        {product.productImages.map((image, index) => (
                             <img
                                 key={index}
                                 src={image}
@@ -164,9 +119,7 @@ const ProductDetails = () =>
                             </div>
                         )}
                     </div>
-                    <button className="add-to-cart" onClick={handleAddToCart} disabled={product.availableQuantity === 0}>
-                        Add to cart
-                    </button>
+                    <button className="add-to-cart" onClick={handleAddToCart} disabled={product.availableQuantity === 0}>Add to cart</button>
                     <button className="wishlist" onClick={handleAddToWishlist}>Save to Wishlist</button>
                 </div>
             </div>
