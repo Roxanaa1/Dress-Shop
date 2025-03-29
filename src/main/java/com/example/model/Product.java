@@ -40,6 +40,9 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column(name = "buying_price")
+    private float buyingPrice;
+
     @OneToMany(mappedBy = "product")
     private List<CartEntry> cartEntries;
 

@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.mapper.UserMapper;
 import com.example.model.User;
 import com.example.model.dtos.AddressDTO;
+import com.example.model.dtos.MonthlyUserCountDTO;
 import com.example.model.dtos.UserDTO;
 import com.example.repository.CartRepository;
 import com.example.repository.UserRepository;
@@ -12,13 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
@@ -136,5 +139,38 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/changePassword/{userId}")
+    public ResponseEntity<?> changePassword(@PathVariable int userId, @RequestBody Map<String, String> passwords) {
+        String oldPassword = passwords.get("oldPassword");
+        String newPassword = passwords.get("newPassword");
+
+        try {
+            userService.changePassword(userId, oldPassword, newPassword);
+            return ResponseEntity.ok("Parola a fost schimbata cu succes!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/users-by-month")
+    public List<MonthlyUserCountDTO> getUsersByMonth() {
+        return userService.getUsersByMonth();
+    }
+
+    @GetMapping("/age-distribution")
+    public Map<String, Long> getAgeDistribution() {
+        return userService.getAgeDistribution();
+    }
+
+    @GetMapping("/verification-status")
+    public ResponseEntity<Map<String, Long>> getVerificationStatus() {
+        return ResponseEntity.ok(userService.getVerifiedStatusCount());
+    }
+
+    @GetMapping("/users-by-county")
+    public Map<String, Long> getUsersByCounty() {
+        return userService.getUsersByCounty();
     }
 }

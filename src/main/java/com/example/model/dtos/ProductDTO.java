@@ -14,6 +14,7 @@ public class ProductDTO
     private int availableQuantity;
     private LocalDate addedDate;
     private CategoryDTO category;
+    private float buyingPrice;
 //    private List<CartEntryDTO> cartEntries;
     private List<ProductProductAttributeDTO> productAttributeAttributeValues;
     private List<String> productImages;

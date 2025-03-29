@@ -4,6 +4,7 @@ import com.example.mapper.AddressMapper;
 import com.example.mapper.UserMapper;
 import com.example.model.*;
 import com.example.model.dtos.AddressDTO;
+import com.example.model.dtos.MonthlyUserCountDTO;
 import com.example.model.dtos.UserDTO;
 import com.example.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,13 +13,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Random;
+import java.time.Period;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
-public class UserService
-{
+public class UserService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
@@ -28,18 +31,18 @@ public class UserService
     private final EmailService emailService;
     private final RoleRepository roleRepository;
     private final ProductImageRepository productImageRepository;
+
     @Autowired
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AddressMapper addressMapper,AddressRepository addressRepository,EmailService emailService,RoleRepository roleRepository,ProductRepository productRepository,ProductImageRepository productImageRepository,CartRepository cartRepository)
-    {
-        this.userRepository=userRepository;
-        this.passwordEncoder=passwordEncoder;
-        this.addressMapper=addressMapper;
-        this.addressRepository=addressRepository;
-        this.emailService=emailService;
-        this.roleRepository=roleRepository;
-        this.productRepository=productRepository;
-        this.productImageRepository=productImageRepository;
-        this.cartRepository=cartRepository;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AddressMapper addressMapper, AddressRepository addressRepository, EmailService emailService, RoleRepository roleRepository, ProductRepository productRepository, ProductImageRepository productImageRepository, CartRepository cartRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.addressMapper = addressMapper;
+        this.addressRepository = addressRepository;
+        this.emailService = emailService;
+        this.roleRepository = roleRepository;
+        this.productRepository = productRepository;
+        this.productImageRepository = productImageRepository;
+        this.cartRepository = cartRepository;
     }
 
     public User create(User user) {
@@ -54,6 +57,7 @@ public class UserService
 
         user.setPassword(encodedPassword);
         user.setRole(role);
+        user.setCreatedAt(LocalDateTime.now());
 
         String verificationCode = String.valueOf(new Random().nextInt(100000, 999999));
         user.setVerificationCode(verificationCode);
@@ -70,12 +74,9 @@ public class UserService
     }
 
 
-
-
-
     public User verify(String email, String verificationCode) {
         System.out.println("Email primit pentru verificare: " + email);
-        User user =userRepository.findByEmail(email.trim())
+        User user = userRepository.findByEmail(email.trim())
 
 
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -112,14 +113,12 @@ public class UserService
     }
 
 
-    public Optional<User>  findUserById(int id)
-    {
+    public Optional<User> findUserById(int id) {
         return userRepository.findById(id);
     }
 
-    public User updateUser(User userDetails,int id)
-    {
-        return userRepository.findById(id).map(user->
+    public User updateUser(User userDetails, int id) {
+        return userRepository.findById(id).map(user ->
         {
             user.setFirstName(userDetails.getFirstName());
             user.setLastName(userDetails.getLastName());
@@ -130,25 +129,22 @@ public class UserService
             user.setDefaultBillingAddress(userDetails.getDefaultBillingAddress());
 
             return userRepository.save(user);
-        }).orElseThrow(()-> new EntityNotFoundException("User not found with id:"+id));
+        }).orElseThrow(() -> new EntityNotFoundException("User not found with id:" + id));
     }
-    public void deleteUser(int id)
-    {
-        if(userRepository.existsById(id))
-        {
+
+    public void deleteUser(int id) {
+        if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-        }
-        else
-        {
-            throw new RuntimeException("User not found with id :"+id);
+        } else {
+            throw new RuntimeException("User not found with id :" + id);
         }
     }
-    public Optional<Boolean> existsByEmail(String email)
-    {
+
+    public Optional<Boolean> existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
-    public boolean checkPassword(String rawPassword, String encodedPassword)
-    {
+
+    public boolean checkPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
@@ -158,8 +154,7 @@ public class UserService
 
 
     @Transactional
-    public AddressDTO addAddressToUser(AddressDTO addressDTO, int userId)
-    {
+    public AddressDTO addAddressToUser(AddressDTO addressDTO, int userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
 
@@ -167,13 +162,13 @@ public class UserService
         address.setUser(user);
         address = addressRepository.save(address);
 
-        if (user.getDefaultBillingAddress() == 0 ) {
+        if (user.getDefaultBillingAddress() == 0) {
             user.setDefaultBillingAddress(address.getId());
         } else {
             user.setDefaultBillingAddress(address.getId());
         }
 
-        if ( user.getDefaultDeliveryAddress() == 0) {
+        if (user.getDefaultDeliveryAddress() == 0) {
             user.setDefaultDeliveryAddress(address.getId());
         } else {
             user.setDefaultDeliveryAddress(address.getId());
@@ -184,9 +179,68 @@ public class UserService
         return addressMapper.addressToAddressDTO(address);
     }
 
-    public User getUserById(int id)
-    {
+    public User getUserById(int id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
+    public void changePassword(int userId, String oldPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("The old password isn't correct.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public List<MonthlyUserCountDTO> getUsersByMonth() {
+        int year = LocalDate.now().getYear();
+        List<Object[]> results = userRepository.countUsersByMonth(year);
+
+        Map<Integer, Long> monthCountMap = results.stream()
+                .collect(Collectors.toMap(
+                        obj -> ((Number) obj[0]).intValue(),
+                        obj -> (Long) obj[1]
+                ));
+
+        return IntStream.rangeClosed(1, 12)
+                .mapToObj(month -> new MonthlyUserCountDTO(month, monthCountMap.getOrDefault(month, 0L)))
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, Long> getAgeDistribution() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .filter(u -> u.getBirthDate() != null)
+                .map(u -> {
+                    int age = Period.between(u.getBirthDate(), LocalDate.now()).getYears();
+                    if (age < 18) return "<18";
+                    if (age < 25) return "18-24";
+                    if (age < 35) return "25-34";
+                    if (age < 45) return "35-44";
+                    if (age < 60) return "45-59";
+                    return "60+";
+                })
+                .collect(Collectors.groupingBy(group -> group, Collectors.counting()));
+    }
+
+    public Map<String, Long> getVerifiedStatusCount() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .collect(Collectors.groupingBy(
+                        u -> u.getVerifiedAccount() != null && u.getVerifiedAccount() ? "Verified" : "Unverified",
+                        Collectors.counting()
+                ));
+    }
+
+    public Map<String, Long> getUsersByCounty() {
+        return userRepository.findAll().stream()
+                .filter(u -> u.getAddresses() != null && !u.getAddresses().isEmpty())
+                .map(u -> u.getAddresses().get(0).getCounty())
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+    }
 }

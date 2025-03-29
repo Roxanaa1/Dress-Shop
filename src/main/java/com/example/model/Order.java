@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @AllArgsConstructor
@@ -48,5 +49,7 @@ public class Order
     @Column(nullable = false)
     private LocalDate orderDate;
 
-
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id")
+    private List<CartEntry> orderItems;
 }

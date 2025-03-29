@@ -14,10 +14,12 @@ public interface ProductMapper {
     @Mapping(source = "category", target = "category")
     @Mapping(source = "productImages", target = "productImages", qualifiedByName = "imagesToUrls")
     @Mapping(source = "productAttributeAttributeValues", target = "productAttributeAttributeValues", qualifiedByName = "mapProductProductAttributes")
+    @Mapping(source = "buyingPrice", target = "buyingPrice")
     ProductDTO productToProductDTO(Product product);
 
     @Mapping(source = "category", target = "category")
     @Mapping(target = "productImages", ignore = true)
+    @Mapping(source = "buyingPrice", target = "buyingPrice")
     Product productDTOToProduct(ProductDTO productDTO);
 
     @Mapping(source = "id", target = "id")

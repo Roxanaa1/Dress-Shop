@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,5 +26,7 @@ public class UserDTO
     private String verificationCode;
     private LocalDateTime verificationCodeExpiration;
     private String role;
+    private LocalDateTime createdAt;
+    private LocalDate birthDate;
 
 }

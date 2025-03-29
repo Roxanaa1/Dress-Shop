@@ -46,7 +46,8 @@ public interface UserMapper
         userDTO.setVerificationCode(user.getVerificationCode());
         userDTO.setVerificationCodeExpiration(user.getVerificationCodeExpiration());
         userDTO.setRole(user.getRole().getRoleType().name());
-
+        userDTO.setCreatedAt(user.getCreatedAt());
+        userDTO.setBirthDate(user.getBirthDate());
         return userDTO;
     }
 
@@ -69,7 +70,8 @@ public interface UserMapper
             role.setRoleType(RoleType.valueOf(userDTO.getRole().toUpperCase()));
             user.setRole(role);
         }
-
+        user.setCreatedAt(userDTO.getCreatedAt());
+        user.setBirthDate(userDTO.getBirthDate());
         return user;
     }
 
