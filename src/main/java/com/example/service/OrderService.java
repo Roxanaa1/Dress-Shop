@@ -60,6 +60,7 @@ public class OrderService {
             order.setUser(user);
             order.setCart(cart);
             order.setOrderDate(LocalDate.now());
+            order.setOrderStatus(OrderStatus.PENDING);
             order.setTotalPrice(orderDTO.getTotalPrice());
 
             if (orderDTO.getPaymentMethod() == null || PaymentMethod.valueOf(orderDTO.getPaymentMethod()) == null) {
@@ -137,6 +138,7 @@ public class OrderService {
             dto.setPaymentMethod(order.getPaymentMethod().toString());
             dto.setTotalPrice(order.getTotalPrice());
             dto.setOrderDate(order.getOrderDate());
+            dto.setOrderStatus(order.getOrderStatus().name());
 
             List<ProductInfoDTO> productList = order.getOrderItems().stream().map(entry -> {
                 Product product = entry.getProduct();

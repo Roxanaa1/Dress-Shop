@@ -19,6 +19,7 @@ public class OrderDetailsDTO {
     private LocalDate orderDate;
     private String paymentMethod;
     private float totalPrice;
+    private String orderStatus;
 
     private List<ProductInfoDTO> products;
 }

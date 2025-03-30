@@ -52,4 +52,8 @@ public class Order
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
     private List<CartEntry> orderItems;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "order_status")
+    private OrderStatus orderStatus;
+
 }
