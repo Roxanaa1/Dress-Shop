@@ -5,6 +5,7 @@ import com.example.model.dtos.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.context.annotation.Primary;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,6 +86,8 @@ public interface ProductMapper {
         }).collect(Collectors.toList());
     }
 
+    @Primary
+    @Named("productDTOToProductManual")
     default Product productDTOToProductManual(ProductDTO dto) {
         Product product = new Product();
         product.setId(dto.getId());

@@ -44,6 +44,11 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(OrderDTO orderDTO) {
+
+        Optional<Order> existingOrder = orderRepository.findByCartIdAndUserIdAndOrderDateIsNull(orderDTO.getCartId(), orderDTO.getUserId());
+        if (existingOrder.isPresent()) {
+            throw new IllegalArgumentException("Comanda deja existentă pentru acest coș.");
+        }
         try {
             User user = userRepository.findById(orderDTO.getUserId())
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + orderDTO.getUserId()));
