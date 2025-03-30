@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import '../styles/Wishlist.css';
 import Navbar from './Navbar';
 
@@ -10,7 +10,7 @@ const Wishlist = () => {
     useEffect(() => {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            alert("Trebuie sa fii logat pentru a vedea wishlist-ul.");
+            alert("You must be logged in to view your wishlist.");
             navigate('/login');
             return;
         }
@@ -25,7 +25,8 @@ const Wishlist = () => {
             .then(data => {
                 if (data.length > 0) {
                     const mappedItems = data.map(item => ({
-                        id: item.productDTO?.id,
+                        wishlistItemId: item.id,
+                        productId: item.productDTO?.id,
                         image: item.productDTO?.productImages?.[0] || 'https://via.placeholder.com/150',
                         name: item.productDTO?.name || 'N/A',
                         price: item.productDTO?.price !== undefined ? `${item.productDTO.price} RON` : 'N/A',
@@ -36,8 +37,8 @@ const Wishlist = () => {
                 }
             })
             .catch(error => {
-                console.error('Eroare la preluarea wishlist-ului:', error);
-                alert('Eroare la preluarea wishlist-ului.');
+                console.error('Error fetching wishlist:', error);
+                alert('Error fetching wishlist.');
             });
     }, [navigate]);
 
@@ -51,33 +52,33 @@ const Wishlist = () => {
         })
             .then(response => {
                 if (response.ok) {
-                    setWishlistItems(prevItems => prevItems.filter(item => item.id !== wishlistItemId));
+                    setWishlistItems(prevItems => prevItems.filter(item => item.wishlistItemId !== wishlistItemId));
                 } else {
                     throw new Error('Failed to remove item');
                 }
             })
             .catch(error => {
                 console.error('Error removing item:', error);
-                alert('Eroare');
+                alert('Error while removing item');
             });
     };
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <div className="wishlist-container">
                 <h2>WISHLIST</h2>
                 {wishlistItems.length === 0 ? (
-                    <p>Nu ai produse în wishlist.</p>
+                    <p>Your wishlist is empty.</p>
                 ) : (
                     <div className="wishlist-grid">
                         {wishlistItems.map(item => (
-                            <div key={item.id} className="wishlist-item">
+                            <div key={item.wishlistItemId} className="wishlist-item">
                                 <img
                                     src={item.image}
                                     alt={item.name}
                                     className="wishlist-image"
-                                    onClick={() => handleProductClick(item.id)}
+                                    onClick={() => handleProductClick(item.productId)}
                                 />
                                 <div className="wishlist-details">
                                     <h3>{item.name}</h3>
@@ -86,7 +87,7 @@ const Wishlist = () => {
                                 <div className="wishlist-actions">
                                     <button
                                         className="wishlist-remove-button"
-                                        onClick={() => handleRemoveClick(item.id)}
+                                        onClick={() => handleRemoveClick(item.wishlistItemId)}
                                     >
                                         <i className="fas fa-trash"></i>
                                     </button>

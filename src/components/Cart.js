@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 import '../styles/Cart.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
-    const [cart, setCart] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
-    const [cartEntry, setCartEntry] = useState([]);
     const [discountCode, setDiscountCode] = useState('');
     const [discount, setDiscount] = useState(0);
     const [deliveryDetails, setDeliveryDetails] = useState({
@@ -26,247 +24,120 @@ const Cart = () => {
     const [paymentMethod, setPaymentMethod] = useState('CASH');
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         setIsLoggedIn(loggedIn);
 
         if (!loggedIn) {
-            alert("Trebuie sa fii logat pentru a accesa cosul de cumparaturi.");
+            alert("You must be logged in to access the shopping cart.");
             navigate('/login');
         } else {
             const cartId = localStorage.getItem('cartId');
             if (cartId) {
                 fetch(`http://localhost:8080/cart/getCartById/${cartId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
+                    .then(res => res.json())
                     .then(data => {
-                        console.log('Data received from server:', data);  // Logă datele primite de la server
-                        if (data.cartEntries) {
-                            const mappedItems = data.cartEntries.map(entry => ({
-                                id: entry.id,
-                                image: entry.product.productImages[0],
-                                name: entry.product.name,
-                                color: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color')?.attributeValue.value || 'Culoare indisponibilă',
-                                size: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size')?.attributeValue.value || 'Mărime indisponibilă',
-                                price: entry.pricePerPiece,
-                                quantity: entry.quantity,
-                                totalPricePerEntry: entry.totalPricePerEntry
-                            }));
-                            setCartItems(mappedItems);
-                        } else {
-                            setCartItems([]);
-                        }
+                        const mapped = data.cartEntries.map(entry => ({
+                            id: entry.id,
+                            image: entry.product.productImages[0],
+                            name: entry.product.name,
+                            color: entry.product.productAttributeAttributeValues.find(a => a.productAttribute.name === 'color')?.attributeValue.value || 'N/A',
+                            size: entry.product.productAttributeAttributeValues.find(a => a.productAttribute.name === 'size')?.attributeValue.value || 'N/A',
+                            price: entry.pricePerPiece,
+                            quantity: entry.quantity,
+                        }));
+                        setCartItems(mapped);
+                        localStorage.setItem('cartItems', JSON.stringify(mapped));
                     })
-                    .catch(error => {
-                        console.error('Error fetching cart:', error);
-                    });
+                    .catch(err => console.error('Error loading cart:', err));
             }
         }
-    }, [navigate,cartItems]);
+    }, [navigate]);
 
-    const handleRemoveItem = (id) => {
-        fetch(`http://localhost:8080/cart/removeItem/${id}`, {
-            method: 'DELETE',
+    const handleRemoveItem = (entryId) => {
+        fetch(`http://localhost:8080/cart/removeItem/${entryId}`, {
+            method: 'DELETE'
         })
-            .then(response => {
-                if (response.ok) {
-                    const cartId = localStorage.getItem('cartId');
-                    fetch(`http://localhost:8080/cart/getCartById/${cartId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Data received after DELETE:', data);
-                            if (data.cartEntries) {
-                                const updatedItems = data.cartEntries.map(entry => ({
-                                    id: entry.id,
-                                    image: entry.product.productImages[0],
-                                    name: entry.product.name,
-                                    color: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'color')?.attributeValue.value || 'Culoare indisponibilă',
-                                    size: entry.product.productAttributeAttributeValues.find(attr => attr.productAttribute.name === 'size')?.attributeValue.value || 'Mărime indisponibilă',
-                                    price: entry.pricePerPiece,
-                                    quantity: entry.quantity,
-                                    totalPricePerEntry: entry.totalPricePerEntry
-                                }));
-                                setCartItems(updatedItems);
-                            } else {
-                                setCartItems([]);
-                            }
-                        });
-                } else {
-                    console.error('Failed to remove item from cart');
-                }
+            .then(res => {
+                if (!res.ok) throw new Error("Error deleting product");
+                setCartItems(prev => prev.filter(item => item.id !== entryId));
             })
-            .catch(error => {
-                console.error('Error removing item:', error);
+            .catch(err => {
+                console.error("Delete error:", err);
+                alert("Failed to remove product from cart.");
             });
+    };
+
+    const handleInputChange = (e) => {
+        const {name, value} = e.target;
+        setDeliveryDetails(prev => ({...prev, [name]: value}));
     };
 
     const handleSaveDeliveryDetails = () => {
         const userId = localStorage.getItem('userId');
-
         fetch(`http://localhost:8080/users/addresses/${userId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(deliveryDetails)
         })
-            .then(response => {
-                console.log('Response from server:', response);
-                if (!response.ok) {
-                    throw new Error('Failed to save delivery details');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Server returned data:', data);
-                alert('Delivery details saved successfully!');
-            })
-            .catch(error => {
-                console.error('Error saving delivery details:', error);
-                alert('Failed to save delivery details');
-            });
+            .then(res => res.json())
+            .then(() => alert('Delivery details saved successfully!'))
+            .catch(() => alert('Failed to save delivery details'));
     };
 
+    const handleStripeCheckout = async () => {
+        const requestData = {
+            productNames: cartItems.map(item => item.name),
+            prices: cartItems.map(item => item.price * 100),
+            quantities: cartItems.map(item => item.quantity)
+        };
 
-
-    const handleQuantityChange = (id, quantity) => {
-        if (quantity < 1) {
-            return;
-        }
-
-        fetch(`http://localhost:8080/cart/updateQuantity/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quantity })
-        })
-            .then(response => {
-                if (response.ok) {
-                    const updatedItems = cartItems.map(item =>
-                        item.id === id ? { ...item, quantity } : item
-                    );
-                    setCartItems(updatedItems);
-                } else {
-                    console.error('Failed to update item quantity');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating item quantity:', error);
+        try {
+            const res = await fetch("http://localhost:8080/payment/create-checkout-session", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(requestData)
             });
-    };
-
-    const handleApplyDiscount = () => {
-        if (discountCode === 'DISCOUNT10') {
-            setDiscount(0.1);
-        } else {
-            setDiscount(0);
+            if (!res.ok) throw new Error("Stripe error");
+            const sessionUrl = await res.text();
+            localStorage.setItem('paymentMethod', 'ONLINE');
+            window.location.href = sessionUrl;
+        } catch (err) {
+            console.error(err);
+            alert("Online payment error");
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setDeliveryDetails(prevDetails => ({
-            ...prevDetails,
-            [name]: value,
-        }));
-    };
-
-    const handlePaymentChange = (e) => {
-        setPaymentMethod(e.target.value);
-    };
-
-    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const shippingCost = 15;
     const total = subtotal - (subtotal * discount) + shippingCost;
 
+    const handlePaymentChange = (e) => setPaymentMethod(e.target.value);
+    const handleApplyDiscount = () => setDiscount(discountCode === 'DISCOUNT10' ? 0.1 : 0);
+
     const handleCheckout = () => {
-        if (cartItems.length === 0) {
-            alert("Cosul tău este gol!");
-            return;
+        if (isProcessing) return;
+        setIsProcessing(true);
+
+        if (paymentMethod === 'online') {
+            handleStripeCheckout();
+        } else if (paymentMethod === 'CASH') {
+            localStorage.setItem('paymentMethod', 'CASH');
+            navigate('/success');
         }
-
-        const userId = localStorage.getItem('userId');
-        const cartId = localStorage.getItem('cartId');
-
-        const orderDetails = {
-            userId: parseInt(userId, 10),
-            cartId: parseInt(cartId, 10),
-            paymentMethod: paymentMethod.toUpperCase(),
-            deliveryAddress: deliveryDetails.deliveryAddressId || parseInt(localStorage.getItem('defaultDeliveryAddress'), 10),
-            invoiceAddress: deliveryDetails.invoiceAddressId || parseInt(localStorage.getItem('defaultBillingAddress'), 10),
-            totalPrice: total,
-            orderDate: new Date().toISOString().split('T')[0]
-        };
-
-        fetch('http://localhost:8080/orders/createOrder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderDetails)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Eroare la plasarea comenzii');
-                }
-            })
-            .then(data => {
-                console.log('Comanda a fost plasată cu succes:', data);
-
-                fetch(`http://localhost:8080/cart/clear/${cartId}`, {
-                    method: 'DELETE',
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            clearCart();
-                            navigate('/OrderSuccess');
-                        } else {
-                            console.error('Failed to clear cart in backend');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error clearing cart:', error);
-                    });
-            })
-            .catch(error => {
-                console.error('Eroare la plasarea comenzii:', error);
-                alert('Eroare la plasarea comenzii: ' + error.message);
-            });
     };
-
-//        emailService.sendOrderConfirmationEmail(user.getEmail(), "Confirmare comandă", "Comanda ta cu numărul " + savedOrder.getId() + " a fost plasată cu succes.");
-
-    const clearCart = () => {
-        setCartItems([]);
-        setCart([]);
-        setTotalPrice(0);
-        setCartEntry([]);
-    };
-
-    useEffect(() => {
-        console.log('Cart updated:', cart);
-        console.log('Cart items updated:', cartItems);
-        console.log('Total price updated:', totalPrice);
-        console.log('Cart entry updated:', cartEntry);
-    }, [cart, cartItems, totalPrice, cartEntry]);
-
 
     return (
         <div className="cart-page">
             <h1>SHOPPING CART</h1>
             <div className="top-info">
-                <div className="info-item">• Special shipping price: 15 lei</div>
-                <div className="info-item">• 14-day return period</div>
+                <div className="info-item">• Special shipping price: 15 RON</div>
+                <div className="info-item">• 14-day return policy</div>
                 <div className="info-item">• FAST delivery 24-48H</div>
             </div>
+
             <div className="cart-content">
                 <div className="cart-items">
                     {cartItems.length === 0 ? (
@@ -279,15 +150,21 @@ const Cart = () => {
                                     <h2>{item.name}</h2>
                                     <p>Color: {item.color}</p>
                                     <p>Size: {item.size}</p>
-                                    <p>Price: {item.price} Lei</p>
-                                    <div className="quantity-container">
-                                        <input
-                                            type="number"
-                                            value={item.quantity}
-                                            min="1"
-                                            onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
-                                        />
-                                    </div>
+                                    <p>Price: {item.price} RON</p>
+                                    <input
+                                        type="number"
+                                        value={item.quantity}
+                                        min="1"
+                                        onChange={(e) =>
+                                            setCartItems(prev =>
+                                                prev.map(p =>
+                                                    p.id === item.id
+                                                        ? {...p, quantity: parseInt(e.target.value)}
+                                                        : p
+                                                )
+                                            )
+                                        }
+                                    />
                                 </div>
                                 <button className="remove-button" onClick={() => handleRemoveItem(item.id)}>
                                     <i className="fas fa-trash"></i>
@@ -296,142 +173,53 @@ const Cart = () => {
                         ))
                     )}
                 </div>
-
-
             </div>
-
 
             <div className="delivery-payment-container">
                 <div className="delivery-details">
                     <h3>Delivery details</h3>
-                    <div className="form-group">
-                        <label>First Name:</label>
-                        <input
-                            type="text"
-                            name="firstName"
-                            value={deliveryDetails.firstName}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Last Name:</label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            value={deliveryDetails.lastName}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Phone Number:</label>
-                        <input
-                            type="text"
-                            name="phone"
-                            value={deliveryDetails.phone}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Country:</label>
-                        <input
-                            type="text"
-                            name="country"
-                            value={deliveryDetails.country}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>County:</label>
-                        <input
-                            type="text"
-                            name="county"
-                            value={deliveryDetails.county}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>City:</label>
-                        <input
-                            type="text"
-                            name="city"
-                            value={deliveryDetails.city}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Address:</label>
-                        <input
-                            type="text"
-                            name="address"
-                            value={deliveryDetails.address}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Street Line:</label>
-                        <input
-                            type="text"
-                            name="streetLine"
-                            value={deliveryDetails.streetLine}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Postal Code:</label>
-                        <input
-                            type="text"
-                            name="postalCode"
-                            value={deliveryDetails.postalCode}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <button onClick={handleSaveDeliveryDetails} className="save-delivery-button">
-                        Save
-                    </button>
-
-
+                    {Object.keys(deliveryDetails)
+                        .filter(key => key !== 'deliveryAddressId' && key !== 'invoiceAddressId')
+                        .map((key, index) => (
+                            <div className="form-group" key={index}>
+                                <label>{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+                                <input type="text" name={key} value={deliveryDetails[key]}
+                                       onChange={handleInputChange}/>
+                            </div>
+                        ))}
+                    <button onClick={handleSaveDeliveryDetails} className="save-delivery-button">Save</button>
                 </div>
 
                 <div className="payment-summary-container">
                     <div className="payment-method">
                         <h3>Payment method</h3>
                         <label>
-                        <input
-                                type="radio"
-                                value="CASH"
-                                checked={paymentMethod === 'CASH'}
-                                onChange={handlePaymentChange}
-                            />
-                            Plata la livrare (Ramburs)
+                            <input type="radio" value="CASH" checked={paymentMethod === 'CASH'}
+                                   onChange={handlePaymentChange}/>
+                            Cash on delivery
                         </label>
                         <label>
-                            <input
-                                type="radio"
-                                value="online"
-                                checked={paymentMethod === 'online'}
-                                onChange={handlePaymentChange}
-                            />
-                            Plata online
+                            <input type="radio" value="online" checked={paymentMethod === 'online'}
+                                   onChange={handlePaymentChange}/>
+                            Online payment
                         </label>
                     </div>
+
                     <div className="cart-summary">
                         <div className="discount">
-                            <input
-                                type="text"
-                                placeholder="Ai un cod de reducere?"
-                                value={discountCode}
-                                onChange={(e) => setDiscountCode(e.target.value)}
-                            />
-                            <button onClick={handleApplyDiscount}>Aplică Reducerea</button>
+                            <input type="text" placeholder="Have a discount code?" value={discountCode}
+                                   onChange={(e) => setDiscountCode(e.target.value)}/>
+                            <button onClick={handleApplyDiscount}>Apply Discount</button>
                         </div>
                         <div className="summary-details">
-                            <p>Valoare comandă: {subtotal.toFixed(2)} Lei</p>
-                            <p>Livrare: {shippingCost === 0 ? 'GRATUIT' : `${shippingCost} Lei`}</p>
+                            <p>Subtotal: {subtotal.toFixed(2)} RON</p>
+                            <p>Shipping: {shippingCost} RON</p>
                             {discount > 0 && <p>Discount: {discount * 100}%</p>}
-                            <p><strong>Total: {total.toFixed(2)} Lei</strong></p>
+                            <p><strong>Total: {total.toFixed(2)} RON</strong></p>
                         </div>
-                        <button onClick={handleCheckout} className="checkout-button">Trimite Comanda</button>
+                        <button onClick={handleCheckout} className="checkout-button">
+                            {paymentMethod === 'online' ? 'Pay Online' : 'Place Order'}
+                        </button>
                     </div>
                 </div>
             </div>

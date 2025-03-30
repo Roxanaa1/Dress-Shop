@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import {BrowserRouter as Router, Route, Routes, useLocation} from 'react-router-dom';
 import UserDashboard from './UserDashboard';
 import Register from './Register';
 import Login from './Login';
@@ -20,6 +20,9 @@ import AdminProductGrid from "./AdminProductGrid";
 import AdminNavbar from "./AdminNavbar";
 import Orders from "./Orders";
 import UserCharts from "./UserCharts";
+import StripeSuccess from "./StripeSucces";
+import StripeCancel from "./StripeCancel";
+
 const AppContent = () => {
     const location = useLocation();
 
@@ -29,33 +32,35 @@ const AppContent = () => {
 
     return (
         <div className="App">
-            {showUserNavbar && <Navbar />}
-            {isAdminRoute && <AdminNavbar />}
+            {showUserNavbar && <Navbar/>}
+            {isAdminRoute && <AdminNavbar/>}
 
             <Routes>
-                <Route path="/" element={<UserDashboard />} />
-                <Route path="/user-dashboard" element={<UserDashboard />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/ProductDetails/:id" element={<ProductDetails />} />
-                <Route path="/dresses/:filter" element={<UserDashboard />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/address" element={<Address />} />
-                <Route path="/sidebar" element={<Sidebar />} />
-                <Route path="/forgotPassword" element={<ForgotPassword />} />
-                <Route path="/orderSuccess" element={<OrderSuccess />} />
-                <Route path="/verify" element={<Verify />} />
+                <Route path="/" element={<UserDashboard/>}/>
+                <Route path="/user-dashboard" element={<UserDashboard/>}/>
+                <Route path="/register" element={<Register/>}/>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/ProductDetails/:id" element={<ProductDetails/>}/>
+                <Route path="/dresses/:filter" element={<UserDashboard/>}/>
+                <Route path="/cart" element={<Cart/>}/>
+                <Route path="/wishlist" element={<Wishlist/>}/>
+                <Route path="/account" element={<Account/>}/>
+                <Route path="/search" element={<Search/>}/>
+                <Route path="/address" element={<Address/>}/>
+                <Route path="/sidebar" element={<Sidebar/>}/>
+                <Route path="/forgotPassword" element={<ForgotPassword/>}/>
+                <Route path="/orderSuccess" element={<OrderSuccess/>}/>
+                <Route path="/verify" element={<Verify/>}/>
 
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                <Route path="/add-product" element={<AddProduct />} />
-                <Route path="/edit-product/:id" element={<AddProduct />} />
-                <Route path="/admin-product-grid" element={<AdminProductGrid />} />
-                <Route path="/admin-orders" element={<Orders />} />
-                <Route path="/admin-charts/users" element={<UserCharts />} />
-                <Route path="*" element={<div>Pagina nu a fost gasita</div>} />
+                <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
+                <Route path="/add-product" element={<AddProduct/>}/>
+                <Route path="/edit-product/:id" element={<AddProduct/>}/>
+                <Route path="/admin-product-grid" element={<AdminProductGrid/>}/>
+                <Route path="/admin-orders" element={<Orders/>}/>
+                <Route path="/admin-charts/users" element={<UserCharts/>}/>
+                <Route path="/success" element={<StripeSuccess/>}/>
+                <Route path="/cancel" element={<StripeCancel/>}/>
+                <Route path="*" element={<div>Pagina nu a fost gasita</div>}/>
             </Routes>
         </div>
     );
@@ -63,7 +68,7 @@ const AppContent = () => {
 
 const App = () => (
     <Router>
-        <AppContent />
+        <AppContent/>
     </Router>
 );
 
