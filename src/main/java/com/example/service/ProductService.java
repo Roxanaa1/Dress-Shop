@@ -107,6 +107,34 @@ public class ProductService {
 
         return entityManager.createQuery(cq).getResultList();
     }
+    public List<Map<String, Object>> getProductsAddedByMonth() {
+        return productRepository.countProductsByMonth();
+    }
+
+    public Map<String, Long> getProductCountByCategory() {
+        List<Object[]> results = productRepository.countProductsByCategory();
+        Map<String, Long> categoryCount = new HashMap<>();
+        for (Object[] row : results) {
+            categoryCount.put((String) row[0], (Long) row[1]);
+        }
+        return categoryCount;
+    }
+
+    public List<Map<String, Object>> getTop5SoldProducts() {
+        return productRepository.findTop5SoldProducts();
+    }
+
+    public List<Map<String, Object>> getMonthlySalesForProduct(int productId) {
+        return productRepository.getMonthlySalesForProduct(productId);
+    }
+
+    public Map<String, Object> getMostSoldProduct() {
+        return productRepository.findMostSoldProduct();
+    }
+
+    public Map<String, Object> getMostProfitableProduct() {
+        return productRepository.findMostProfitableProduct();
+    }
 
     @Transactional
     public Product updateProduct(int id, Product productDetails) {

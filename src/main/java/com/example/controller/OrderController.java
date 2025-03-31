@@ -2,8 +2,7 @@ package com.example.controller;
 
 import com.example.mapper.OrderMapper;
 import com.example.model.Order;
-import com.example.model.dtos.OrderDTO;
-import com.example.model.dtos.OrderDetailsDTO;
+import com.example.model.dtos.*;
 import com.example.service.CartService;
 import com.example.service.OrderService;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,11 +15,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-@Controller
-
+@RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "http://localhost:3000")
 public class OrderController {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
@@ -59,6 +59,30 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrderDetails());
     }
 
+    @GetMapping("/orders-by-month")
+    public List<MonthlyCountDTO> getOrdersByMonth() {
+        return orderService.getOrdersByMonth();
+    }
+
+    @GetMapping("/orders-by-county")
+    public Map<String, Integer> getOrdersByCounty() {
+        return orderService.getOrdersByCounty();
+    }
+
+    @GetMapping("/revenue-by-month")
+    public List<MonthlyTotalDTO> getRevenueByMonth() {
+        return orderService.getRevenueByMonth();
+    }
+
+    @GetMapping("/status-distribution")
+    public Map<String, Integer> getOrderStatusDistribution() {
+        return orderService.getOrderStatusDistribution();
+    }
+
+    @GetMapping("/top-customers")
+    public List<CustomerOrderCountDTO> getTopCustomers(@RequestParam(defaultValue = "5") int limit) {
+        return orderService.getTopCustomers(limit);
+    }
 
     @PutMapping("/updateOrder/{id}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable int id, @RequestBody OrderDTO orderDTO) {

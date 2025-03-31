@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -83,6 +84,36 @@ public class ProductController {
                 .map(productMapper::productToProductDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
+    }
+
+    @GetMapping("/by-month")
+    public ResponseEntity<List<Map<String, Object>>> getProductsByMonth() {
+        return ResponseEntity.ok(productService.getProductsAddedByMonth());
+    }
+
+    @GetMapping("/by-category")
+    public ResponseEntity<Map<String, Long>> getProductCountByCategory() {
+        return ResponseEntity.ok(productService.getProductCountByCategory());
+    }
+
+    @GetMapping("/top-sold")
+    public ResponseEntity<List<Map<String, Object>>> getTopSoldProducts() {
+        return ResponseEntity.ok(productService.getTop5SoldProducts());
+    }
+
+    @GetMapping("/sales-evolution/{productId}")
+    public ResponseEntity<List<Map<String, Object>>> getSalesEvolution(@PathVariable int productId) {
+        return ResponseEntity.ok(productService.getMonthlySalesForProduct(productId));
+    }
+
+    @GetMapping("/most-sold")
+    public ResponseEntity<Map<String, Object>> getMostSoldProduct() {
+        return ResponseEntity.ok(productService.getMostSoldProduct());
+    }
+
+    @GetMapping("/most-profitable")
+    public ResponseEntity<Map<String, Object>> getMostProfitableProduct() {
+        return ResponseEntity.ok(productService.getMostProfitableProduct());
     }
 
 
