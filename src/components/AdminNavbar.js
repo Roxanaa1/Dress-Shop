@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import '../styles/AdminNavbar.css';
 
 const AdminNavbar = () => {
@@ -31,12 +31,21 @@ const AdminNavbar = () => {
                 <button onClick={() => navigate('/admin-charts/products')} className="charts-button">PRODUCT CHARTS
                 </button>
                 <button onClick={() => navigate('/admin-charts/orders')} className="charts-button">ORDER CHARTS</button>
+                <button onClick={() => navigate('/admin-reports/products')} className="charts-button">
+                    PRODUCT REPORTS
+                </button>
+                <button onClick={() => navigate('/admin-reports/users')} className="charts-button">
+                    USER REPORTS
+                </button>
+                <button onClick={() => navigate('/admin-reports/orders')} className="charts-button">
+                    ORDER REPORTS
+                </button>
 
             </div>
 
             <div className="navbar-icons">
                 <a onClick={() => navigate('/account')} aria-label="Account">
-                    <i className="fas fa-user"></i>
+                <i className="fas fa-user"></i>
                 </a>
                 <a href="#menu" aria-label="Menu">
                     <i className="fas fa-bars"></i>

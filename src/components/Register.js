@@ -9,8 +9,7 @@ function Register() {
         email: '',
         phoneNumber: '',
         password: '',
-        birthDate: '',
-        role: 'USER'
+        birthDate: ''
     });
 
     const [error, setError] = useState(null);
@@ -52,7 +51,7 @@ function Register() {
             setError(null);
 
             localStorage.setItem('email', userData.email);
-            localStorage.setItem('role', userData.role);
+            localStorage.setItem('role', result.role);
             localStorage.setItem('isLoggedIn', 'true');
 
             navigate(`/verify?email=${userData.email}`);
@@ -132,19 +131,6 @@ function Register() {
                             onChange={handleInputChange}
                             required
                         />
-                    </div>
-                    <div>
-                        <label htmlFor="role">Role:</label>
-                        <select
-                            id="role"
-                            name="role"
-                            value={userData.role}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="USER">User</option>
-                            <option value="ADMIN">Admin</option>
-                        </select>
                     </div>
                     <button type="submit">Register</button>
                 </form>

@@ -22,7 +22,11 @@ import Orders from "./Orders";
 import UserCharts from "./UserCharts";
 import StripeSuccess from "./StripeSucces";
 import StripeCancel from "./StripeCancel";
-
+import ProductCharts from "./ProductCharts";
+import OrderCharts from "./OrderCharts";
+import ProductReports from "./ProductReports";
+import UserReports from "./UserRaports";
+import OrderRaports from "./OrderRaports";
 const AppContent = () => {
     const location = useLocation();
 
@@ -60,6 +64,12 @@ const AppContent = () => {
                 <Route path="/admin-charts/users" element={<UserCharts/>}/>
                 <Route path="/success" element={<StripeSuccess/>}/>
                 <Route path="/cancel" element={<StripeCancel/>}/>
+                <Route path="/admin-charts/products" element={<ProductCharts />} />
+                <Route path="/admin-charts/orders" element={<OrderCharts />} />
+                <Route path="/admin-reports/products" element={<ProductReports />} />
+                <Route path="/admin-reports/users" element={<UserReports />} />
+                <Route path="/admin-reports/orders" element={<OrderRaports />} />
+
                 <Route path="*" element={<div>Pagina nu a fost gasita</div>}/>
             </Routes>
         </div>

@@ -1,0 +1,95 @@
+.report-container {
+    padding: 40px 60px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.report-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.year-select {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 15px;
+}
+
+.report-table-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    overflow-x: auto;
+    padding: 24px;
+}
+
+.report-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.report-subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.report-table thead {
+    background-color: #16a085;
+    color: white;
+    text-transform: uppercase;
+}
+
+.report-table th,
+.report-table td {
+    padding: 14px 20px;
+    border: 1px solid #d1d5db;
+    text-align: left;
+}
+
+.report-table tbody tr:nth-child(even) {
+    background-color: #f3f4f6;
+}
+
+.report-pdf-btn {
+    background-color: #16a085;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.report-pdf-btn:hover {
+    background-color: #12856c;
+}
+
+.report-pdf-btn.small {
+    padding: 6px 14px;
+    font-size: 13px;
+}

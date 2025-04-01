@@ -26,6 +26,7 @@ const Orders = () => {
                     <th>Date</th>
                     <th>Payment</th>
                     <th>Total</th>
+                    <th>Status</th>
                     <th>Details</th>
                 </tr>
                 </thead>
@@ -39,6 +40,7 @@ const Orders = () => {
                         <td>{order.orderDate}</td>
                         <td>{order.paymentMethod}</td>
                         <td>{order.totalPrice} RON</td>
+                        <td>{order.orderStatus}</td>
                         <td>
                             <button className="details-btn" onClick={() => setSelectedOrder(order)}>
                                 View

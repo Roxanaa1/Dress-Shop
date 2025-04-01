@@ -3,16 +3,15 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell
 } from 'recharts';
 import axios from 'axios';
-import '../styles/AdminCharts.css';
 
-const COLORS = ['#82ca9d', '#ff7f7f'];
-const COUNTY_COLORS = ['#8884d8', '#8dd1e1', '#ffc658', '#a4de6c', '#d0ed57', '#d8854f'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#a4de6c', '#d0ed57', '#ff7f7f'];
 
-const UserCharts = () => {
-    const [userData, setUserData] = useState([]);
-    const [ageData, setAgeData] = useState([]);
-    const [verificationData, setVerificationData] = useState([]);
-    const [countyData, setCountyData] = useState([]);
+const OrderCharts = () => {
+    const [ordersByMonth, setOrdersByMonth] = useState([]);
+    const [ordersByCounty, setOrdersByCounty] = useState([]);
+    const [revenueByMonth, setRevenueByMonth] = useState([]);
+    const [statusDistribution, setStatusDistribution] = useState([]);
+    const [topCustomers, setTopCustomers] = useState([]);
     const [selectedYear, setSelectedYear] = useState(2024);
 
     const monthNumberToName = (num) => {
@@ -38,53 +37,41 @@ const UserCharts = () => {
     };
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/users/users-by-month?year=${selectedYear}`)
-            .then(response => {
-                const data = response.data.map(item => ({
+        axios.get(`http://localhost:8080/orders/orders-by-month?year=${selectedYear}`)
+            .then(res => {
+                const data = res.data.map(item => ({
                     month: item.month,
                     count: item.count
                 }));
-                setUserData(fillAllMonths(data, 'count'));
-            })
-            .catch(error => {
-                console.error('Error fetching user data:', error);
+                setOrdersByMonth(fillAllMonths(data, 'count'));
             });
 
-        axios.get('http://localhost:8080/users/age-distribution')
-            .then(response => {
-                const formatted = Object.entries(response.data).map(([ageGroup, count]) => ({
-                    ageGroup,
-                    count
-                }));
-                setAgeData(formatted);
-            })
-            .catch(error => {
-                console.error('Error fetching age distribution:', error);
+        axios.get(`http://localhost:8080/orders/orders-by-county?year=${selectedYear}`)
+            .then(res => {
+                const data = Object.entries(res.data).map(([county, count]) => ({ county, count }));
+                setOrdersByCounty(data);
             });
 
-        axios.get('http://localhost:8080/users/verification-status')
-            .then(response => {
-                const formatted = Object.entries(response.data).map(([key, value]) => ({
-                    name: key,
-                    value
+        axios.get(`http://localhost:8080/orders/revenue-by-month?year=${selectedYear}`)
+            .then(res => {
+                const data = res.data.map(item => ({
+                    month: item.month,
+                    total: item.total
                 }));
-                setVerificationData(formatted);
-            })
-            .catch(error => {
-                console.error('Error fetching verification data:', error);
+                setRevenueByMonth(fillAllMonths(data, 'total'));
             });
 
-        axios.get('http://localhost:8080/users/users-by-county')
-            .then(response => {
-                const formatted = Object.entries(response.data).map(([county, count]) => ({
-                    county,
-                    count
-                }));
-                setCountyData(formatted);
-            })
-            .catch(error => {
-                console.error('Error fetching county data:', error);
+        axios.get(`http://localhost:8080/orders/status-distribution?year=${selectedYear}`)
+            .then(res => {
+                const data = Object.entries(res.data).map(([name, value]) => ({ name, value }));
+                setStatusDistribution(data);
             });
+
+        axios.get(`http://localhost:8080/orders/top-customers?year=${selectedYear}`)
+            .then(res => {
+                setTopCustomers(res.data);
+            });
+
     }, [selectedYear]);
 
     return (
@@ -97,35 +84,47 @@ const UserCharts = () => {
                 </select>
             </div>
 
-            <h2 style={{ textAlign: 'center' }}>User Registrations Per Month</h2>
+            <h2 style={{ textAlign: 'center' }}>Orders per Month</h2>
             <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={userData}>
+                <BarChart data={ordersByMonth}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="count" fill="#8884d8" name="Users Registered" />
+                    <Bar dataKey="count" fill="#8884d8" name="Orders" />
                 </BarChart>
             </ResponsiveContainer>
 
-            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>User Age Distribution</h2>
+            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>Order Revenue per Month</h2>
             <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={ageData}>
+                <BarChart data={revenueByMonth}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="ageGroup" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total" fill="#82ca9d" name="Total Revenue" />
+                </BarChart>
+            </ResponsiveContainer>
+
+            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>Orders by County</h2>
+            <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={ordersByCounty}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="county" />
                     <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="count" fill="#82ca9d" name="Users per Age Group" />
+                    <Bar dataKey="count" fill="#ffc658" name="Orders per County" />
                 </BarChart>
             </ResponsiveContainer>
 
-            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>Verified vs Unverified Users</h2>
+            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>Order Status Distribution</h2>
             <ResponsiveContainer width="100%" height={400}>
                 <PieChart>
                     <Pie
-                        data={verificationData}
+                        data={statusDistribution}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
@@ -133,7 +132,7 @@ const UserCharts = () => {
                         outerRadius={120}
                         dataKey="value"
                     >
-                        {verificationData.map((_, index) => (
+                        {statusDistribution.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>
@@ -142,19 +141,19 @@ const UserCharts = () => {
                 </PieChart>
             </ResponsiveContainer>
 
-            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>User Distribution by County</h2>
+            <h2 style={{ textAlign: 'center', marginTop: '4rem' }}>Top 5 Customers</h2>
             <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={countyData}>
+                <BarChart data={topCustomers}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="county" />
+                    <XAxis dataKey="name" />
                     <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="count" fill="#ffc658" name="Users per County" />
+                    <Bar dataKey="orders" fill="#d8854f" name="Number of Orders" />
                 </BarChart>
             </ResponsiveContainer>
         </div>
     );
 };
 
-export default UserCharts;
+export default OrderCharts;
