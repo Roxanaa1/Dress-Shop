@@ -31,4 +31,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                 ORDER BY month
             """)
     List<Object[]> countUsersByMonth(@Param("year") int year);
+
 }

@@ -65,7 +65,7 @@ public interface UserMapper
         user.setVerificationCode(userDTO.getVerificationCode());
         user.setVerificationCodeExpiration(userDTO.getVerificationCodeExpiration());
 
-        if (userDTO.getRole() != null) {
+        if (userDTO.getRole() != null && !userDTO.getRole().isEmpty()) {
             Role role = new Role();
             role.setRoleType(RoleType.valueOf(userDTO.getRole().toUpperCase()));
             user.setRole(role);

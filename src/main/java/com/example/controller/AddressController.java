@@ -12,28 +12,23 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/addresses")
 @CrossOrigin(origins = "http://localhost:3000")
-public class AddressController
-{
-
+public class AddressController {
     private final AddressService addressService;
 
     @Autowired
-    public AddressController(AddressService addressService)
-    {
+    public AddressController(AddressService addressService) {
         this.addressService = addressService;
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<AddressDTO> getAddress(@PathVariable int userId)
-    {
+    public ResponseEntity<AddressDTO> getAddress(@PathVariable int userId) {
         Optional<AddressDTO> addressOptional = addressService.getAddressByUserId(userId);
         return addressOptional.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<AddressDTO> updateAddress(@PathVariable int userId, @RequestBody AddressDTO addressDTO)
-    {
+    public ResponseEntity<AddressDTO> updateAddress(@PathVariable int userId, @RequestBody AddressDTO addressDTO) {
         try {
             AddressDTO updatedAddress = addressService.updateUserAddress(userId, addressDTO);
             return ResponseEntity.ok(updatedAddress);

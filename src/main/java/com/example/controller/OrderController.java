@@ -4,6 +4,7 @@ import com.example.mapper.OrderMapper;
 import com.example.model.Order;
 import com.example.model.dtos.*;
 import com.example.service.CartService;
+import com.example.service.OrderChartsService;
 import com.example.service.OrderService;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,16 +23,21 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:3000")
 public class OrderController {
     private final OrderService orderService;
+    private final OrderChartsService orderChartsService;
     private final OrderMapper orderMapper;
     private final CartService cartService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
-    public OrderController(OrderService orderService, OrderMapper orderMapper, CartService cartService) {
+    public OrderController(OrderService orderService,
+                           OrderMapper orderMapper,
+                           CartService cartService,
+                           OrderChartsService orderChartsService) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
         this.cartService = cartService;
+        this.orderChartsService = orderChartsService;
     }
 
     @PostMapping("/createOrder")
@@ -60,29 +65,31 @@ public class OrderController {
     }
 
     @GetMapping("/orders-by-month")
-    public List<MonthlyCountDTO> getOrdersByMonth() {
-        return orderService.getOrdersByMonth();
+    public List<MonthlyCountDTO> getOrdersByMonth(@RequestParam int year) {
+        return orderChartsService.getOrdersByMonth(year);
     }
 
     @GetMapping("/orders-by-county")
-    public Map<String, Integer> getOrdersByCounty() {
-        return orderService.getOrdersByCounty();
+    public Map<String, Integer> getOrdersByCounty(@RequestParam int year) {
+        return orderChartsService.getOrdersByCounty(year);
     }
 
     @GetMapping("/revenue-by-month")
-    public List<MonthlyTotalDTO> getRevenueByMonth() {
-        return orderService.getRevenueByMonth();
+    public List<MonthlyTotalDTO> getRevenueByMonth(@RequestParam int year) {
+        return orderChartsService.getRevenueByMonth(year);
     }
 
     @GetMapping("/status-distribution")
-    public Map<String, Integer> getOrderStatusDistribution() {
-        return orderService.getOrderStatusDistribution();
+    public Map<String, Integer> getOrderStatusDistribution(@RequestParam int year) {
+        return orderChartsService.getOrderStatusDistribution(year);
     }
 
     @GetMapping("/top-customers")
-    public List<CustomerOrderCountDTO> getTopCustomers(@RequestParam(defaultValue = "5") int limit) {
-        return orderService.getTopCustomers(limit);
+    public List<CustomerOrderCountDTO> getTopCustomers(@RequestParam(defaultValue = "5") int limit,
+                                                       @RequestParam int year) {
+        return orderChartsService.getTopCustomers(limit, year);
     }
+
 
     @PutMapping("/updateOrder/{id}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable int id, @RequestBody OrderDTO orderDTO) {

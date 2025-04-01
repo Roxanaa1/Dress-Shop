@@ -193,51 +193,6 @@ public class OrderService {
         return orderRepository.findById(id);
     }
 
-    public List<MonthlyCountDTO> getOrdersByMonth() {
-        List<Object[]> results = orderRepository.countOrdersByMonth();
-        List<MonthlyCountDTO> counts = new ArrayList<>();
-        for (Object[] row : results) {
-            counts.add(new MonthlyCountDTO((int) row[0], ((Long) row[1]).intValue()));
-        }
-        return counts;
-    }
-
-    public Map<String, Integer> getOrdersByCounty() {
-        List<Object[]> results = orderRepository.countOrdersByCounty();
-        Map<String, Integer> map = new HashMap<>();
-        for (Object[] row : results) {
-            map.put((String) row[0], ((Long) row[1]).intValue());
-        }
-        return map;
-    }
-
-    public List<MonthlyTotalDTO> getRevenueByMonth() {
-        List<Object[]> results = orderRepository.sumOrderValuesByMonth();
-        List<MonthlyTotalDTO> totals = new ArrayList<>();
-        for (Object[] row : results) {
-            totals.add(new MonthlyTotalDTO((int) row[0], ((Double) row[1])));
-        }
-        return totals;
-    }
-
-    public Map<String, Integer> getOrderStatusDistribution() {
-        List<Object[]> results = orderRepository.countByStatus();
-        Map<String, Integer> map = new HashMap<>();
-        for (Object[] row : results) {
-            map.put(row[0].toString(), ((Long) row[1]).intValue());
-        }
-        return map;
-    }
-
-    public List<CustomerOrderCountDTO> getTopCustomers(int limit) {
-        List<Object[]> results = orderRepository.findTopCustomers(PageRequest.of(0, limit));
-        List<CustomerOrderCountDTO> list = new ArrayList<>();
-        for (Object[] row : results) {
-            list.add(new CustomerOrderCountDTO((String) row[0], ((Long) row[1]).intValue()));
-        }
-        return list;
-    }
-
     public Order updateOrder(Order orderDetails, int id) {
         return orderRepository.findById(id).map(order ->
         {

@@ -16,19 +16,28 @@ public interface OrderRepository extends JpaRepository<Order, Integer>
 {
     Optional<Order> findByCartIdAndUserIdAndOrderDateIsNull(int cartId,int userId);
     List<Order> findByOrderStatusAndOrderDateBefore(OrderStatus status, LocalDate date);
-    @Query("SELECT EXTRACT(MONTH FROM o.orderDate) AS month, COUNT(o) AS count FROM Order o GROUP BY month")
-    List<Object[]> countOrdersByMonth();
+    @Query("SELECT EXTRACT(MONTH FROM o.orderDate) AS month, COUNT(o) AS count " +
+            "FROM Order o WHERE EXTRACT(YEAR FROM o.orderDate) = :year GROUP BY month")
+    List<Object[]> countOrdersByMonthFilteredByYear(int year);
 
-    @Query("SELECT a.county, COUNT(o) FROM Order o JOIN o.user u JOIN Address a ON a.id = u.defaultDeliveryAddress GROUP BY a.county")
-    List<Object[]> countOrdersByCounty();
+    @Query("SELECT a.county, COUNT(o) " +
+            "FROM Order o JOIN o.user u JOIN Address a ON a.id = u.defaultDeliveryAddress " +
+            "WHERE EXTRACT(YEAR FROM o.orderDate) = :year GROUP BY a.county")
+    List<Object[]> countOrdersByCountyFilteredByYear(int year);
 
-    @Query("SELECT EXTRACT(MONTH FROM o.orderDate) AS month, SUM(o.totalPrice) AS total FROM Order o GROUP BY month")
-    List<Object[]> sumOrderValuesByMonth();
+    @Query("SELECT EXTRACT(MONTH FROM o.orderDate) AS month, SUM(o.totalPrice) AS total " +
+            "FROM Order o WHERE EXTRACT(YEAR FROM o.orderDate) = :year GROUP BY month")
+    List<Object[]> sumOrderValuesByMonthFilteredByYear(int year);
 
-    @Query("SELECT o.orderStatus, COUNT(o) FROM Order o GROUP BY o.orderStatus")
-    List<Object[]> countByStatus();
+    @Query("SELECT o.orderStatus, COUNT(o) " +
+            "FROM Order o WHERE EXTRACT(YEAR FROM o.orderDate) = :year GROUP BY o.orderStatus")
+    List<Object[]> countByStatusFilteredByYear(int year);
 
-    @Query("SELECT CONCAT(u.firstName, ' ', u.lastName), COUNT(o) FROM Order o JOIN o.user u GROUP BY u.id, u.firstName, u.lastName ORDER BY COUNT(o) DESC")
-    List<Object[]> findTopCustomers(Pageable pageable);
+    @Query("SELECT CONCAT(u.firstName, ' ', u.lastName), COUNT(o) " +
+            "FROM Order o JOIN o.user u " +
+            "WHERE EXTRACT(YEAR FROM o.orderDate) = :year " +
+            "GROUP BY u.id, u.firstName, u.lastName ORDER BY COUNT(o) DESC")
+    List<Object[]> findTopCustomersFilteredByYear(Pageable pageable, int year);
+
 
 }

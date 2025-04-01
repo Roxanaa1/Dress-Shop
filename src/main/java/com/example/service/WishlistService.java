@@ -10,12 +10,12 @@ import com.example.repository.WishlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class WishlistService
-{
+public class WishlistService {
     private final WishlistRepository wishlistRepository;
     private final WishlistMapper wishlistMapper;
     private final ProductRepository productRepository;
@@ -28,16 +28,14 @@ public class WishlistService
     }
 
     @Transactional
-    public WishlistDTO addProductToWishlist(int userId, int productId)
-    {
+    public WishlistDTO addProductToWishlist(int userId, int productId) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         // verific daca produsul exista deja in wishlist
         Wishlist existingWishlistItem = wishlistRepository.findByUserIdAndProductId(userId, productId);
-        if (existingWishlistItem != null)
-        {
+        if (existingWishlistItem != null) {
             return wishlistMapper.wishlistToWishlistDTO(existingWishlistItem);
         }
 
@@ -50,18 +48,16 @@ public class WishlistService
         return wishlistMapper.wishlistToWishlistDTO(savedWishlistItem);
     }
 
-    @Transactional
-    public void removeItemFromWishlist(int wishlistItemId)
-    {
-        wishlistRepository.deleteById(wishlistItemId);
-    }
-
-    public List<WishlistDTO> getWishlistByUser(int userId)
-    {
+    public List<WishlistDTO> getWishlistByUser(int userId) {
         List<Wishlist> wishlistItems = wishlistRepository.findByUserId(userId);
 
         return wishlistItems.stream()
                 .map(wishlistMapper::wishlistToWishlistDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void removeItemFromWishlist(int wishlistItemId) {
+        wishlistRepository.deleteById(wishlistItemId);
     }
 }

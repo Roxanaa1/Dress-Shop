@@ -7,6 +7,7 @@ import com.example.model.dtos.MonthlyUserCountDTO;
 import com.example.model.dtos.UserDTO;
 import com.example.repository.CartRepository;
 import com.example.repository.UserRepository;
+import com.example.service.UserChartsService;
 import com.example.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +27,25 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     private final UserService userService;
+    private final UserChartsService userChartsService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper, PasswordEncoder passwordEncoder, CartRepository cartRepository, UserRepository userRepository) {
+    public UserController(UserService userService,
+                          UserMapper userMapper,
+                          PasswordEncoder passwordEncoder,
+                          CartRepository cartRepository,
+                          UserRepository userRepository,
+                          UserChartsService userChartsService) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.cartRepository = cartRepository;
         this.userRepository = userRepository;
+        this.userChartsService = userChartsService;
     }
 
     @PostMapping()
@@ -48,6 +56,19 @@ public class UserController {
         return ResponseEntity.ok(createdUserDTO);
     }
 
+    @PostMapping("/addresses/{userId}")
+    public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO, @PathVariable int userId) {
+        if (userId == 0) {
+            throw new RuntimeException("Invalid user ID");
+        }
+
+        try {
+            AddressDTO savedAddress = userService.addAddressToUser(addressDTO, userId);
+            return ResponseEntity.ok(savedAddress);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO userDto) {
@@ -76,6 +97,26 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/users-by-month")
+    public ResponseEntity<List<Map<String, Object>>> getUsersByMonth(@RequestParam int year) {
+        return ResponseEntity.ok(userChartsService.getUserRegistrationsByMonth(year));
+    }
+
+    @GetMapping("/age-distribution")
+    public Map<String, Long> getAgeDistribution() {
+        return userChartsService.getAgeDistribution();
+    }
+
+    @GetMapping("/verification-status")
+    public ResponseEntity<Map<String, Long>> getVerificationStatus() {
+        return ResponseEntity.ok(userChartsService.getVerifiedStatusCount());
+    }
+
+    @GetMapping("/users-by-county")
+    public Map<String, Long> getUsersByCounty() {
+        return userChartsService.getUsersByCounty();
+    }
+
 
     @PutMapping("/user")
     public ResponseEntity<User> updateUserData(@RequestBody User userData) {
@@ -96,19 +137,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/addresses/{userId}")
-    public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO addressDTO, @PathVariable int userId) {
-        if (userId == 0) {
-            throw new RuntimeException("Invalid user ID");
-        }
-
-        try {
-            AddressDTO savedAddress = userService.addAddressToUser(addressDTO, userId);
-            return ResponseEntity.ok(savedAddress);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
 
     @GetMapping("/getUserById/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
@@ -131,16 +159,6 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @PutMapping("/changePassword/{userId}")
     public ResponseEntity<?> changePassword(@PathVariable int userId, @RequestBody Map<String, String> passwords) {
         String oldPassword = passwords.get("oldPassword");
@@ -154,23 +172,13 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users-by-month")
-    public List<MonthlyUserCountDTO> getUsersByMonth() {
-        return userService.getUsersByMonth();
-    }
-
-    @GetMapping("/age-distribution")
-    public Map<String, Long> getAgeDistribution() {
-        return userService.getAgeDistribution();
-    }
-
-    @GetMapping("/verification-status")
-    public ResponseEntity<Map<String, Long>> getVerificationStatus() {
-        return ResponseEntity.ok(userService.getVerifiedStatusCount());
-    }
-
-    @GetMapping("/users-by-county")
-    public Map<String, Long> getUsersByCounty() {
-        return userService.getUsersByCounty();
+    @DeleteMapping("/deleteUser/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

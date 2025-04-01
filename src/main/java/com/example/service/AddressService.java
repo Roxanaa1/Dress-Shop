@@ -19,14 +19,24 @@ public class AddressService {
     private final AddressMapper addressMapper;
 
     @Autowired
-    public AddressService(UserRepository userRepository, AddressMapper addressMapper)
-    {
+    public AddressService(UserRepository userRepository, AddressMapper addressMapper) {
         this.userRepository = userRepository;
         this.addressMapper = addressMapper;
     }
 
-    public Optional<AddressDTO> getAddressByUserId(int userId)
-    {
+    public AddressDTO addAddressToUser(int userId, AddressDTO addressDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Address address = addressMapper.addressDTOToAddress(addressDTO);
+        address.setUser(user);
+        user.getAddresses().add(address);
+        userRepository.save(user);
+
+        return addressMapper.addressToAddressDTO(address);
+    }
+
+    public Optional<AddressDTO> getAddressByUserId(int userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
         return userOptional.map(user -> {
@@ -42,22 +52,7 @@ public class AddressService {
         });
     }
 
-
-    public AddressDTO addAddressToUser(int userId, AddressDTO addressDTO)
-    {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        Address address = addressMapper.addressDTOToAddress(addressDTO);
-        address.setUser(user);
-        user.getAddresses().add(address);
-        userRepository.save(user);
-
-        return addressMapper.addressToAddressDTO(address);
-    }
-
-    public AddressDTO updateUserAddress(int userId, AddressDTO addressDTO)
-    {
+    public AddressDTO updateUserAddress(int userId, AddressDTO addressDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
@@ -67,16 +62,13 @@ public class AddressService {
 
 
         List<Address> addresses = user.getAddresses();
-        if (addresses.isEmpty())
-        {
+        if (addresses.isEmpty()) {
             addresses.add(address);
-        } else
-        {
-             addresses.set(0, address);
+        } else {
+            addresses.set(0, address);
         }
         userRepository.save(user);
 
         return addressMapper.addressToAddressDTO(address);
     }
-
 }

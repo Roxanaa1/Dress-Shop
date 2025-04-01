@@ -20,47 +20,29 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/cart")
 @CrossOrigin(origins = "http://localhost:3000")
-public class CartController
-{
+public class CartController {
     private final CartService cartService;
     private final UserService userService;
     private final ProductService productService;
     private final ProductMapper productMapper;
+
     @Autowired
-    public CartController(CartService cartService,UserService userService,ProductService productService,ProductMapper productMapper)
-    {
-        this.cartService=cartService;
-        this.userService=userService;
-        this.productService=productService;
-        this.productMapper=productMapper;
-    }
-
-    @GetMapping("/getAllCarts")
-    public ResponseEntity<List<CartDTO>> getAllCarts()
-    {
-        List<CartDTO> carts = cartService.getAllCarts();
-        return ResponseEntity.ok(carts);
-    }
-
-    @GetMapping("/getCartById/{id}")
-    public ResponseEntity<CartDTO> getCartById(@PathVariable int id)
-    {
-        CartDTO cart = cartService.getCartById(id);
-        return ResponseEntity.ok(cart);
+    public CartController(CartService cartService, UserService userService, ProductService productService, ProductMapper productMapper) {
+        this.cartService = cartService;
+        this.userService = userService;
+        this.productService = productService;
+        this.productMapper = productMapper;
     }
 
     @PostMapping("createCart")
-    public ResponseEntity<CartDTO> createCart(@RequestBody CartDTO cartDTO)
-    {
+    public ResponseEntity<CartDTO> createCart(@RequestBody CartDTO cartDTO) {
         CartDTO newCart = cartService.createCart(cartDTO);
         return ResponseEntity.ok(newCart);
     }
 
     @PostMapping("/addToCart/{cartId}")
-    public ResponseEntity<CartDTO> addToCart(@PathVariable int cartId, @RequestBody CartEntryDTO cartEntryDTO)
-    {
-        if (cartEntryDTO == null || cartEntryDTO.getProduct() == null)
-        {
+    public ResponseEntity<CartDTO> addToCart(@PathVariable int cartId, @RequestBody CartEntryDTO cartEntryDTO) {
+        if (cartEntryDTO == null || cartEntryDTO.getProduct() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
@@ -71,6 +53,23 @@ public class CartController
     }
 
 
+    @GetMapping("/getAllCarts")
+    public ResponseEntity<List<CartDTO>> getAllCarts() {
+        List<CartDTO> carts = cartService.getAllCarts();
+        return ResponseEntity.ok(carts);
+    }
+
+    @GetMapping("/getCartById/{id}")
+    public ResponseEntity<CartDTO> getCartById(@PathVariable int id) {
+        CartDTO cart = cartService.getCartById(id);
+        return ResponseEntity.ok(cart);
+    }
+
+    @PutMapping("/updateCart/{id}")
+    public ResponseEntity<CartDTO> updateCart(@PathVariable int id, @RequestBody CartDTO cartDTO) {
+        CartDTO updatedCart = cartService.updateCart(id, cartDTO);
+        return ResponseEntity.ok(updatedCart);
+    }
 
     @DeleteMapping("/removeItem/{itemId}")
     public ResponseEntity<?> removeItemFromCart(@PathVariable int itemId) {
@@ -86,8 +85,7 @@ public class CartController
     }
 
     @DeleteMapping("/clear/{cartId}")
-    public ResponseEntity<?> clearCart(@PathVariable int cartId)
-    {
+    public ResponseEntity<?> clearCart(@PathVariable int cartId) {
         try {
             cartService.clearCart(cartId);
             return ResponseEntity.ok().build();
@@ -97,19 +95,9 @@ public class CartController
         }
     }
 
-    @PutMapping("/updateCart/{id}")
-    public ResponseEntity<CartDTO> updateCart(@PathVariable int id, @RequestBody CartDTO cartDTO)
-    {
-        CartDTO updatedCart = cartService.updateCart(id, cartDTO);
-        return ResponseEntity.ok(updatedCart);
-    }
-
     @DeleteMapping("/deleteCart/{id}")
-    public ResponseEntity<Void> deleteCart(@PathVariable int id)
-    {
+    public ResponseEntity<Void> deleteCart(@PathVariable int id) {
         cartService.deleteCart(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

@@ -11,14 +11,20 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository  extends JpaRepository<Product,Integer>
-{
+public interface ProductRepository extends JpaRepository<Product, Integer> {
+
     List<Product> findByCategoryNameIgnoreCase(String categoryName);
 
     List<Product> findByNameContainingIgnoreCase(String query);
+
     @Query(value = "SELECT EXTRACT(MONTH FROM p.addeddate) AS month, COUNT(*) AS count " +
             "FROM product p GROUP BY month ORDER BY month", nativeQuery = true)
     List<Map<String, Object>> countProductsByMonth();
+
+    @Query(value = "SELECT EXTRACT(MONTH FROM p.addeddate) AS month, COUNT(*) AS count " +
+            "FROM product p WHERE EXTRACT(YEAR FROM p.addeddate) = :year " +
+            "GROUP BY month ORDER BY month", nativeQuery = true)
+    List<Map<String, Object>> countProductsByMonth(@Param("year") int year);
 
     @Query(value = "SELECT c.name AS category, COUNT(p.id) AS count " +
             "FROM product p JOIN category c ON p.category_id = c.id " +
@@ -38,6 +44,13 @@ public interface ProductRepository  extends JpaRepository<Product,Integer>
             "WHERE ce.product_id = :productId " +
             "GROUP BY month ORDER BY month", nativeQuery = true)
     List<Map<String, Object>> getMonthlySalesForProduct(@Param("productId") int productId);
+
+    @Query(value = "SELECT EXTRACT(MONTH FROM o.order_date) AS month, SUM(ce.quantity) AS sales " +
+            "FROM cart_entry ce " +
+            "JOIN orders o ON ce.order_id = o.id " +
+            "WHERE ce.product_id = :productId AND EXTRACT(YEAR FROM o.order_date) = :year " +
+            "GROUP BY month ORDER BY month", nativeQuery = true)
+    List<Map<String, Object>> getMonthlySalesForProduct(@Param("productId") int productId, @Param("year") int year);
 
     @Query(value = "SELECT p.name AS productName, SUM(ce.quantity) AS unitsSold, p.price " +
             "FROM cart_entry ce " +

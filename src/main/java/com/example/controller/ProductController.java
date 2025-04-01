@@ -4,6 +4,7 @@ import com.example.mapper.ProductMapper;
 import com.example.model.Product;
 import com.example.model.User;
 import com.example.model.dtos.ProductDTO;
+import com.example.service.ProductChartsService;
 import com.example.service.ProductService;
 import com.example.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,15 +23,20 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
     private final ProductService productService;
+    private final ProductChartsService productChartsService;
 
     private final ProductMapper productMapper;
     private final UserService userService;
 
     @Autowired
-    public ProductController(ProductService productService, ProductMapper productMapper, UserService userService) {
+    public ProductController(ProductService productService,
+                             ProductMapper productMapper,
+                             UserService userService,
+                             ProductChartsService productChartsService) {
         this.productService = productService;
         this.productMapper = productMapper;
         this.userService = userService;
+        this.productChartsService = productChartsService;
     }
 
     @PostMapping("/addProduct")
@@ -87,35 +93,35 @@ public class ProductController {
     }
 
     @GetMapping("/by-month")
-    public ResponseEntity<List<Map<String, Object>>> getProductsByMonth() {
-        return ResponseEntity.ok(productService.getProductsAddedByMonth());
+    public ResponseEntity<List<Map<String, Object>>> getProductsByMonth(@RequestParam int year) {
+        return ResponseEntity.ok(productChartsService.getProductsAddedByMonth(year));
     }
 
     @GetMapping("/by-category")
     public ResponseEntity<Map<String, Long>> getProductCountByCategory() {
-        return ResponseEntity.ok(productService.getProductCountByCategory());
+        return ResponseEntity.ok(productChartsService.getProductCountByCategory());
     }
 
     @GetMapping("/top-sold")
     public ResponseEntity<List<Map<String, Object>>> getTopSoldProducts() {
-        return ResponseEntity.ok(productService.getTop5SoldProducts());
+        return ResponseEntity.ok(productChartsService.getTop5SoldProducts());
     }
 
     @GetMapping("/sales-evolution/{productId}")
-    public ResponseEntity<List<Map<String, Object>>> getSalesEvolution(@PathVariable int productId) {
-        return ResponseEntity.ok(productService.getMonthlySalesForProduct(productId));
+    public ResponseEntity<List<Map<String, Object>>> getSalesEvolution(@PathVariable int productId,
+                                                                       @RequestParam int year) {
+        return ResponseEntity.ok(productChartsService.getMonthlySalesForProduct(productId, year));
     }
 
     @GetMapping("/most-sold")
     public ResponseEntity<Map<String, Object>> getMostSoldProduct() {
-        return ResponseEntity.ok(productService.getMostSoldProduct());
+        return ResponseEntity.ok(productChartsService.getMostSoldProduct());
     }
 
     @GetMapping("/most-profitable")
     public ResponseEntity<Map<String, Object>> getMostProfitableProduct() {
-        return ResponseEntity.ok(productService.getMostProfitableProduct());
+        return ResponseEntity.ok(productChartsService.getMostProfitableProduct());
     }
-
 
     @PutMapping("/updateProduct/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable int id, @RequestBody ProductDTO productDTO) {

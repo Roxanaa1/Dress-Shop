@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CartService
-{
+public class CartService {
 
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
@@ -29,18 +28,22 @@ public class CartService
     private final ProductMapper productMapper;
 
     @Autowired
-    public CartService(CartRepository cartRepository, CartMapper cartMapper,CartEntryRepository cartEntryRepository,ProductRepository productRepository,ProductMapper productMapper)
-    {
+    public CartService(CartRepository cartRepository, CartMapper cartMapper, CartEntryRepository cartEntryRepository, ProductRepository productRepository, ProductMapper productMapper) {
         this.cartRepository = cartRepository;
         this.cartMapper = cartMapper;
-        this.cartEntryRepository=cartEntryRepository;
-        this.productRepository=productRepository;
-        this.productMapper=productMapper;
+        this.cartEntryRepository = cartEntryRepository;
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+    }
+
+    public CartDTO createCart(CartDTO cartDTO) {
+        Cart cart = cartMapper.cartDTOToCart(cartDTO);
+        Cart savedCart = cartRepository.save(cart);
+        return cartMapper.cartToCartDTO(savedCart);
     }
 
     @Transactional
-    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO)
-    {
+    public CartDTO addToCart(int cartId, CartEntryDTO cartEntryDTO) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -78,35 +81,22 @@ public class CartService
         return cartMapper.cartToCartDTO(updatedCart);
     }
 
-
-
-    public void removeItem(int itemId)
-    {
-        cartEntryRepository.deleteById(itemId);
-    }
-
-    public List<CartDTO> getAllCarts()
-    {
+    public List<CartDTO> getAllCarts() {
         List<Cart> carts = cartRepository.findAll();
         return carts.stream().map(cartMapper::cartToCartDTO).collect(Collectors.toList());
     }
 
-    public CartDTO getCartById(int id)
-    {
+    public CartDTO getCartById(int id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
         return cartMapper.cartToCartDTO(cart);
     }
 
-    public CartDTO createCart(CartDTO cartDTO)
-    {
-        Cart cart = cartMapper.cartDTOToCart(cartDTO);
-        Cart savedCart = cartRepository.save(cart);
-        return cartMapper.cartToCartDTO(savedCart);
+    public Cart findCartById(int id) {
+        return cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found with id: " + id));
     }
 
-    public CartDTO updateCart(int id, CartDTO cartDTO)
-    {
+    public CartDTO updateCart(int id, CartDTO cartDTO) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
         cart.setTotalPrice(cartDTO.getTotalPrice());
@@ -114,8 +104,7 @@ public class CartService
         return cartMapper.cartToCartDTO(updatedCart);
     }
 
-    public void deleteCart(int id)
-    {
+    public void deleteCart(int id) {
         cartRepository.deleteById(id);
     }
 
@@ -124,10 +113,8 @@ public class CartService
 
         cartEntryRepository.deleteByCartId(cartId);
     }
-    public Cart findCartById(int id)
-    {
-        return cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found with id: " + id));
+
+    public void removeItem(int itemId) {
+        cartEntryRepository.deleteById(itemId);
     }
-
-
 }
