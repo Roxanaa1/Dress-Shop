@@ -18,7 +18,7 @@ public class OrderScheduler {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "0 0 17 * * *")
     public void completeOldOrders() {
         LocalDate twoDaysAgo = LocalDate.now().minusDays(2);
         List<Order> ordersToUpdate = orderRepository

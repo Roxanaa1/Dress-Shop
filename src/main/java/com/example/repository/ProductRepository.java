@@ -66,4 +66,18 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             "WHERE ce.order_id IS NOT NULL " +
             "GROUP BY p.name ORDER BY totalProfit DESC LIMIT 1", nativeQuery = true)
     Map<String, Object> findMostProfitableProduct();
+
+
+    @Query("SELECT p FROM Product p " +
+            "JOIN p.category c " +
+            "JOIN p.productAttributeAttributeValues pav " +
+            "JOIN pav.attributeValue av " +
+            "WHERE (:category IS NULL OR c.name = :category) " +
+            "AND (:color IS NULL OR av.value = :color) " +
+            "AND (:size IS NULL OR av.value = :size)")
+    List<Product> findByCategoryAndAttributes(@Param("category") String category,
+                                              @Param("color") String color,
+                                              @Param("size") String size);
+
+
 }
