@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items: center;
     background-color: rgba(167, 114, 125);
-    padding: 20px;
+    padding: 15px;
     color: #D0B8A8;
     width: 100%;
     position: fixed;
@@ -15,7 +15,7 @@
 }
 
 body {
-    padding-top: 60px;
+    padding-top: 10px;
 }
 
 .navbar-brand {
