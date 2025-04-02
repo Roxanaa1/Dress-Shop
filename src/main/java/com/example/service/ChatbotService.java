@@ -24,6 +24,10 @@ public class ChatbotService {
     public String askGpt(String message) {
         String intent = classifyIntent(message);
 
+        if (message.trim().isEmpty()) {
+            return "Bună! 👋 Cu ce te pot ajuta astăzi?";
+        }
+
         if (intent.equals("multumesc")) {
             return "Eu vă mulțumesc! 💜";
         }
@@ -43,37 +47,83 @@ public class ChatbotService {
                     keywords.get("category"), keywords.get("color"), keywords.get("size"));
 
             if (products.isEmpty()) {
-                return "Nu am găsit produse care să corespundă cerințelor tale.";
+                return "Îmi pare rău, nu am găsit produse care să corespundă exact cerințelor tale. Poți verifica toate rochiile aici: http://localhost:3000/dresses/all";
             }
 
-            StringBuilder response = new StringBuilder("Am găsit următoarele produse:\n");
+            StringBuilder productList = new StringBuilder();
             for (Product product : products) {
                 if (product != null && product.getId() > 0) {
-                    response.append("- ").append(product.getName())
-                            .append(" - ").append("http://localhost:3000/ProductDetails/")
+                    productList.append("- ").append(product.getName())
+                            .append(" - http://localhost:3000/ProductDetails/")
                             .append(product.getId()).append("\n");
                 }
             }
 
-            return response.toString().trim();
-        }
+            List<com.theokanning.openai.completion.chat.ChatMessage> messages = List.of(
+                    new com.theokanning.openai.completion.chat.ChatMessage(
+                            com.theokanning.openai.completion.chat.ChatMessageRole.SYSTEM.value(),
+                            "Ești un asistent prietenos care ajută clienții să găsească rochii într-un magazin online. " +
+                            "Primești o listă de produse deja filtrate, fiecare cu un link corect. " +
+                                    "Nu modifica linkurile și nu adăuga niciun caracter după ele (punct, paranteză, slash, virgulă etc.). " +
+                                    "Scrie un răspuns natural și politicos în limba română, ca un consultant de modă. " +
+                                    "Fiecare link trebuie să apară exact cum l-ai primit, pe un rând separat sau după numele produsului. " +
+                                    "Dacă utilizatorul întreabă despre livrare, răspunde strict că durează 1-2 zile lucrătoare, fără alte detalii. " +
+                                    "Dacă întreabă despre schimbarea parolei, răspunde că trebuie să meargă în secțiunea Cont → Date personale pentru a o schimba. " +
+                                    "Dacă întreabă despre plată, răspunde că poate plăti online cu cardul sau ramburs la livrare."
+                    ),
+                    new com.theokanning.openai.completion.chat.ChatMessage(
+                            com.theokanning.openai.completion.chat.ChatMessageRole.USER.value(), message),
+                    new com.theokanning.openai.completion.chat.ChatMessage(
+                            com.theokanning.openai.completion.chat.ChatMessageRole.ASSISTANT.value(), productList.toString())
+            );
 
-        if (intent.equals("order")) {
-            return "Poți verifica comenzile tale în contul personal, secțiunea Wishlist sau Adrese.";
-        } else if (intent.equals("payment")) {
-            return "Poți plăti online cu cardul sau ramburs la livrare.";
-        } else if (intent.equals("delivery")) {
-            return "Livrarea durează între 2-4 zile lucrătoare.";
-        } else if (intent.equals("account")) {
-            return "Îți poți modifica datele din secțiunea Cont -> Date personale.";
-        }
+            var request = com.theokanning.openai.completion.chat.ChatCompletionRequest.builder()
+                    .model("gpt-3.5-turbo")
+                    .messages(messages)
+                    .temperature(0.7)
+                    .maxTokens(500)
+                    .build();
 
-        return "Îmi pare rău, nu am înțeles cererea. Poți reformula?";
+            return openAiService.createChatCompletion(request)
+                    .getChoices()
+                    .get(0)
+                    .getMessage()
+                    .getContent();
+        }
+        if (List.of("order", "payment", "delivery", "account").contains(intent)) {
+            List<com.theokanning.openai.completion.chat.ChatMessage> messages = List.of(
+                    new com.theokanning.openai.completion.chat.ChatMessage(
+                            com.theokanning.openai.completion.chat.ChatMessageRole.SYSTEM.value(),
+                            "Ești un asistent virtual al unui magazin online de rochii. " +
+                                    "Răspunde clar și politicos la întrebările despre comenzi, cont, livrare sau plată. " +
+                                    "Nu inventa funcționalități. Răspunde în limba română, ca și cum ai vorbi cu un client real."),
+                    new com.theokanning.openai.completion.chat.ChatMessage(
+                            com.theokanning.openai.completion.chat.ChatMessageRole.USER.value(), message)
+            );
+
+            var request = com.theokanning.openai.completion.chat.ChatCompletionRequest.builder()
+                    .model("gpt-3.5-turbo")
+                    .messages(messages)
+                    .temperature(0.7)
+                    .maxTokens(300)
+                    .build();
+
+            return openAiService.createChatCompletion(request)
+                    .getChoices()
+                    .get(0)
+                    .getMessage()
+                    .getContent();
+        }
+        return "Îmi pare rău, nu am înțeles exact cererea. Poți reformula?";
+
     }
 
     private String classifyIntent(String input) {
         String lower = input.toLowerCase();
 
+        if (lower.contains("multumesc") || lower.contains("mersi") || lower.contains("thanks")) {
+            return "multumesc";
+        }
         if (lower.contains("rochie") || lower.contains("marimea") || lower.contains("marime")
                 || lower.contains("zi") || lower.contains("elegant") || lower.contains("culoare")) {
             return "product";
