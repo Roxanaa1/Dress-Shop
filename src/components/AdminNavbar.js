@@ -47,9 +47,6 @@ const AdminNavbar = () => {
                 <a onClick={() => navigate('/account')} aria-label="Account">
                 <i className="fas fa-user"></i>
                 </a>
-                <a href="#menu" aria-label="Menu">
-                    <i className="fas fa-bars"></i>
-                </a>
             </div>
         </header>
     );

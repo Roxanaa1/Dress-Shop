@@ -10,29 +10,35 @@
 
 .details-container {
     display: flex;
+    justify-content: center;
+    align-items: stretch;
     max-width: 1200px;
     margin: 0 auto;
-    gap: 30px;
+    gap: 40px;
     padding-top: 30px;
-    align-items: flex-start;
+    min-height: 520px;
 }
 
+/* imaginea + thumbnails */
 .image-details-wrapper {
+    width: 400px;
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: 10px;
     align-items: flex-start;
-    flex: 1 1 50%;
 }
 
+/* imagine principală fixă */
 .main-image {
     width: 320px;
     height: 480px;
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: block;
 }
 
+/* thumbnails verticale */
 .thumbnail-gallery-vertical {
     display: flex;
     flex-direction: column;
@@ -53,12 +59,18 @@
     border-color: #000;
 }
 
+/* zona info produs – dimensiune fixă */
 .product-info {
-    flex: 1 1 40%;
-    padding: 20px;
+    width: 400px;
+    padding: 25px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    min-height: 500px;
 }
 
 .product-info h1 {

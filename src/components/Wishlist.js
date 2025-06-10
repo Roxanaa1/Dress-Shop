@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import '../styles/Wishlist.css';
-import Navbar from './Navbar';
+import UserNavbar from './UserNavbar';
 
 const Wishlist = () => {
     const [wishlistItems, setWishlistItems] = useState([]);
@@ -65,7 +65,7 @@ const Wishlist = () => {
 
     return (
         <div>
-            <Navbar/>
+            <UserNavbar/>
             <div className="wishlist-container">
                 <h2>WISHLIST</h2>
                 {wishlistItems.length === 0 ? (

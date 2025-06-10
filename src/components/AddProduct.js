@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Navbar from "./Navbar";
+import UserNavbar from "./UserNavbar";
 import AdminNavbar from "./AdminNavbar";
 import '../styles/AddProduct.css';
 
@@ -157,7 +157,7 @@ const AddProduct = () => {
 
     return (
         <div>
-            {role === "admin" ? <AdminNavbar /> : <Navbar />}
+            {role === "admin" ? <AdminNavbar /> : <UserNavbar />}
             <div className="add-product-container">
                 <div className="add-product-form">
                     <h2>{id ? "Edit Product" : "Add Product"}</h2>

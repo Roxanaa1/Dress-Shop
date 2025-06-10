@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Navbar from './Navbar';
 import '../styles/Home.css';
 
 const UserDashboard = () => {
@@ -68,7 +67,6 @@ const UserDashboard = () => {
 
     return (
         <div className="Home">
-            <Navbar />
             <main className="main-content">
 
                 <div className="main-header">

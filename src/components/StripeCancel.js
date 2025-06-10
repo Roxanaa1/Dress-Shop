@@ -16,7 +16,7 @@ const StripeCancel = () => {
                 borderRadius: '4px',
                 cursor: 'pointer'
             }}>
-                Înapoi la coș
+               Back to cart
             </button>
         </div>
     );

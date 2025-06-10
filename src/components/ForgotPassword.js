@@ -1,51 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/ForgotPassword.css';
-import Sidebar from "./Sidebar";
 
-const ForgotPassword = () => {
+function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
-    const handleResetPassword = async () => {
+    useEffect(() => {
+        document.body.className = 'forgot-password-page';
+        return () => {
+            document.body.className = '';
+        };
+    }, []);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-
-            const response = await fetch('http://localhost:8080/reset-password', {
+            const response = await fetch('http://localhost:8080/users/forgot-password', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to send reset password email');
-            }
+            const text = await response.text();
 
-            const data = await response.json();
-            setMessage(data.message);
+            if (response.ok) {
+                setMessage(text);
+                setTimeout(() => {
+                    navigate('/ResetPassword');
+                }, 2000);
+            } else {
+                throw new Error(text);
+            }
         } catch (error) {
-            setMessage('Failed to send email. Please try again later.');
+            setMessage(error.message || 'Error sending reset code.');
         }
     };
 
     return (
-        <div className="forgot-password-page">
-
-            <h1>Reset Your Password</h1>
-            <p>Please enter your email address below to receive instructions for resetting your password.</p>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-            />
-            <button onClick={handleResetPassword}>Send Instructions</button>
+        <div className="login-container">
+            <h2>Forgot Password</h2>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <button type="submit">Send Reset Code</button>
+            </form>
             {message && <p>{message}</p>}
         </div>
     );
-};
+}
 
 export default ForgotPassword;

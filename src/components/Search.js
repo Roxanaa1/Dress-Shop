@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Navbar from './Navbar';
+import UserNavbar from './UserNavbar';
 import '../styles/Search.css';
 
 const Search = () => {
@@ -45,7 +45,7 @@ const Search = () => {
 
     return (
         <div>
-            <Navbar />
+            <UserNavbar />
             <div className="wishlist-container">
                 <h2>SEARCH RESULTS</h2>
                 {error && <p className="error">{error}</p>}

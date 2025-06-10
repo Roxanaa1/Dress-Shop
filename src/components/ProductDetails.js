@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/ProductDetails.css';
-import Navbar from './Navbar';
+import UserNavbar from './UserNavbar';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -31,7 +33,7 @@ const ProductDetails = () => {
     const handleAddToCart = () => {
         const cartId = localStorage.getItem('cartId');
         if (!cartId || !product?.id) {
-            alert("Trebuie sa fii logat pentru a adauga produse in cos.");
+            toast.warn("You must be logged in to add products to your cart.");
             return;
         }
 
@@ -56,14 +58,14 @@ const ProductDetails = () => {
                 if (!response.ok) throw new Error('Error');
                 return response.json();
             })
-            .then(() => alert('Produsul a fost adaugat in cos!'))
-            .catch(() => alert('Eroare'));
+            .then(() => toast.success('The product has been added to the cart.!'))
+            .catch(() => toast.error('Error'));
     };
 
     const handleAddToWishlist = () => {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            alert("Trebuie sa fii logat pentru a adauga produse in wishlist.");
+            toast.warn("Trebuie sa fii logat pentru a adauga produse in wishlist.");
             return;
         }
 
@@ -76,13 +78,13 @@ const ProductDetails = () => {
                 if (!response.ok) throw new Error('Error');
                 return response.json();
             })
-            .then(() => alert('Produsul a fost adaugat in wishlist!'))
-            .catch(() => alert('Eroare'));
+            .then(() => toast.success('Produsul a fost adaugat in wishlist!'))
+            .catch(() => toast.error('Eroare'));
     };
 
     return (
         <div className="ProductDetails">
-            <Navbar />
+            <UserNavbar />
             <div className="details-container">
                 <div className="image-details-wrapper">
                     <img src={selectedImage} alt={product.name} className="main-image" />
@@ -123,6 +125,7 @@ const ProductDetails = () => {
                     <button className="wishlist" onClick={handleAddToWishlist}>Save to Wishlist</button>
                 </div>
             </div>
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
         </div>
     );
 };

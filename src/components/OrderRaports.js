@@ -66,14 +66,14 @@ const OrderReports = () => {
       body: ordersByMonth.map(row => [luni[row.month], row.count])
     });
 
-    doc.text("Venituri pe Lună", 14, doc.lastAutoTable.finalY + 10);
+    doc.text("Venituri pe Luna", 14, doc.lastAutoTable.finalY + 10);
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 15,
       head: [["Luna", "Venit (RON)"]],
       body: revenueByMonth.map(row => [luni[row.month], row.total])
     });
 
-    doc.text("Comenzi pe Județe", 14, doc.lastAutoTable.finalY + 10);
+    doc.text("Comenzi pe Judete", 14, doc.lastAutoTable.finalY + 10);
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 15,
       head: [["Județ", "Număr"]],
@@ -87,7 +87,7 @@ const OrderReports = () => {
       body: statusDistribution.map(row => [row.status, row.count])
     });
 
-    doc.text("Top Clienți", 14, doc.lastAutoTable.finalY + 10);
+    doc.text("Top Clienti", 14, doc.lastAutoTable.finalY + 10);
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 15,
       head: [["Client", "Comenzi"]],

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbar from "./Navbar";
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import UserNavbar from "./UserNavbar";
 import AdminNavbar from "./AdminNavbar";
 import '../styles/Account.css';
 
@@ -47,8 +47,8 @@ const Account = () => {
     }, [navigate]);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setUser(prev => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setUser(prev => ({...prev, [name]: value}));
     };
 
     const handleSaveProfile = async () => {
@@ -58,13 +58,13 @@ const Account = () => {
         try {
             const response = await fetch(`http://localhost:8080/users/user`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(user)
             });
 
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'Failed to update user.');
-            alert("Datele au fost actualizate cu succes!");
+            alert("Data has been updated successfully.!");
         } catch (err) {
             alert(err.message);
         }
@@ -74,7 +74,7 @@ const Account = () => {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
-            alert("Parolele noi nu coincid.");
+            alert("The new passwords do not match.");
             return;
         }
 
@@ -83,7 +83,7 @@ const Account = () => {
         try {
             const response = await fetch(`http://localhost:8080/users/changePassword/${userId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     oldPassword: currentPassword,
                     newPassword: newPassword
@@ -91,16 +91,16 @@ const Account = () => {
             });
 
             if (response.ok) {
-                alert("Parola a fost schimbată cu succes!");
+                alert("Password changed successfully!");
                 setCurrentPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
             } else {
                 const data = await response.text();
-                alert(data || "Eroare la schimbarea parolei.");
+                alert(data || "Error");
             }
         } catch (err) {
-            alert("Eroare la schimbarea parolei.");
+            alert("Error ");
             console.error(err);
         }
     };
@@ -112,13 +112,12 @@ const Account = () => {
 
     return (
         <div>
-            {role === "ADMIN" ? <AdminNavbar /> : <Navbar />}
+            {role === "ADMIN" ? <AdminNavbar/> : <UserNavbar/>}
 
             <div className="account-container">
                 <div className="sidebar">
                     <button className="sidebar-button" onClick={() => navigate('/Account')}>Personal Data</button>
                     <button className="sidebar-button" onClick={() => navigate('/Address')}>Addresses</button>
-                    <button className="sidebar-button" onClick={() => navigate('/Wishlist')}>Wishlist</button>
                     <button className="sidebar-button" onClick={handleLogout}>Logout</button>
                 </div>
 

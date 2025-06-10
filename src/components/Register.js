@@ -47,7 +47,7 @@ function Register() {
             }
 
             const result = await response.json();
-            setSuccess('Te rugăm să-ți verifici emailul pentru a finaliza procesul de înregistrare.');
+            setSuccess('Te rugam sa-ti verifici emailul pentru a finaliza procesul de înregistrare.');
             setError(null);
 
             localStorage.setItem('email', userData.email);

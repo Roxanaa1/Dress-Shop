@@ -11,11 +11,6 @@ const Sidebar = ({ handleLogout }) => {
             <button className="sidebar-button" onClick={() => navigate('/Account')}>Personal Data</button>
             <button className="sidebar-button" onClick={() => navigate('/Address')}>Addresses</button>
 
-            {role !== "ADMIN" && (
-                <button className="sidebar-button" onClick={() => navigate('/Wishlist')}>Wishlist</button>
-            )}
-
-
             <button className="sidebar-button" onClick={handleLogout}>Logout</button>
         </div>
     );

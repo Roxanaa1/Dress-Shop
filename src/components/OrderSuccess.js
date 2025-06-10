@@ -7,11 +7,11 @@ const OrderSuccess = () => {
 
     return (
         <div className="order-success-container">
-            <h1>Comanda a fost plasată cu succes!</h1>
+            <h1>Comanda a fost plasata cu succes!</h1>
             <p>Mulțumim pentru comanda ta!</p>
 
             <div className="order-actions">
-                <button onClick={() => navigate('/')}>Înapoi la pagina principală</button>
+                <button onClick={() => navigate('/')}>Înapoi la pagina principala</button>
             </div>
         </div>
     );
