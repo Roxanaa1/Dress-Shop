@@ -34,7 +34,6 @@ public interface UserMapper
         userDTO.setDefaultDeliveryAddress(user.getDefaultDeliveryAddress());
         userDTO.setDefaultBillingAddress(user.getDefaultBillingAddress());
 
-        // Adăugăm verificare pentru orders ca să evităm NullPointerException
         userDTO.setOrderIds(user.getOrders() != null ?
                 user.getOrders().stream()
                         .map(Order::getId)
