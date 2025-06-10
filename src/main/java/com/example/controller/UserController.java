@@ -77,6 +77,31 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        try {
+            userService.sendResetCode(email);
+            return ResponseEntity.ok("Reset code sent to your email.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        String newPassword = request.get("newPassword");
+
+        try {
+            userService.resetPasswordWithCode(email, code, newPassword);
+            return ResponseEntity.ok("Password has been successfully reset.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/verify")
     public ResponseEntity<String> verifyAccount(@RequestBody Map<String, String> requestBody) {
         String email = requestBody.get("email");

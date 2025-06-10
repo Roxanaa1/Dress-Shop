@@ -33,7 +33,6 @@ public class WishlistService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // verific daca produsul exista deja in wishlist
         Wishlist existingWishlistItem = wishlistRepository.findByUserIdAndProductId(userId, productId);
         if (existingWishlistItem != null) {
             return wishlistMapper.wishlistToWishlistDTO(existingWishlistItem);

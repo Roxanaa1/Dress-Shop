@@ -38,6 +38,4 @@ public interface OrderRepository extends JpaRepository<Order, Integer>
             "WHERE EXTRACT(YEAR FROM o.orderDate) = :year " +
             "GROUP BY u.id, u.firstName, u.lastName ORDER BY COUNT(o) DESC")
     List<Object[]> findTopCustomersFilteredByYear(Pageable pageable, int year);
-
-
 }

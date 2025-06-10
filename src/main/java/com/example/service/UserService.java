@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 
 @Service
 public class UserService {
+    private final Map<String, String> resetCodes = new HashMap<>();
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
@@ -47,23 +48,18 @@ public class UserService {
 
     public User create(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-
         RoleType selectedRole = (user.getRole() != null && user.getRole().getRoleType() != null)
                 ? user.getRole().getRoleType()
                 : RoleType.USER;
-
         Role role = roleRepository.findByRoleType(selectedRole)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
-
         user.setPassword(encodedPassword);
         user.setRole(role);
         user.setCreatedAt(LocalDateTime.now());
-
         String verificationCode = String.valueOf(new Random().nextInt(100000, 999999));
         user.setVerificationCode(verificationCode);
         user.setVerificationCodeExpiration(LocalDateTime.now().plusMinutes(10));
         user.setVerifiedAccount(false);
-
         User savedUser = userRepository.save(user);
         Cart cart = new Cart();
         cart.setUser(savedUser);
@@ -102,16 +98,40 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (!user.getVerifiedAccount()) {
-            throw new RuntimeException("Contul nu este verificat!");
+            throw new RuntimeException("Your account is not verified!");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Parolă incorectă!");
+            throw new RuntimeException("Incorrect password!");
         }
 
         return user;
     }
 
+    public void sendResetCode(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("No account associated with this email.");
+        }
+
+        String code = String.valueOf(new Random().nextInt(900000) + 100000);
+        resetCodes.put(email, code);
+        emailService.sendResetPasswordCode(email, code);
+    }
+
+    public void resetPasswordWithCode(String email, String code, String newPassword) {
+        String storedCode = resetCodes.get(email);
+        if (storedCode == null || !storedCode.equals(code)) {
+            throw new RuntimeException("Invalid or expired reset code.");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        resetCodes.remove(email);
+    }
 
     public Optional<User> findUserById(int id) {
         return userRepository.findById(id);

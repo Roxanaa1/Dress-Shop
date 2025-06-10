@@ -44,7 +44,7 @@ public class OrderService {
 
         Optional<Order> existingOrder = orderRepository.findByCartIdAndUserIdAndOrderDateIsNull(orderDTO.getCartId(), orderDTO.getUserId());
         if (existingOrder.isPresent()) {
-            throw new IllegalArgumentException("Comanda deja existentă pentru acest coș.");
+            throw new IllegalArgumentException("Comanda deja existenta pentru acest cos.");
         }
         try {
             User user = userRepository.findById(orderDTO.getUserId())

@@ -45,12 +45,19 @@ public class EmailService {
     }
 
     public void sendVerificationEmail(String toEmail, String verificationCode) {
-        String verificationUrl = "http://localhost:3000/verify?code=" + verificationCode;
-
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Account Verification");
-        message.setText("Please use the following code to verify your account: " + verificationUrl);
+        message.setText("Please use the following code to verify your account: " + verificationCode);
+
+        mailSender.send(message);
+    }
+
+    public void sendResetPasswordCode(String toEmail, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Password Reset");
+        message.setText("Your reset code is: " + code + "\nUse it to reset your password.");
 
         mailSender.send(message);
     }

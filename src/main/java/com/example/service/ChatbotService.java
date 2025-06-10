@@ -13,7 +13,6 @@ import java.util.Map;
 @Service
 public class ChatbotService {
 
-
     private final OpenAiService openAiService;
     private final ProductRepository productRepository;
 
@@ -45,7 +44,10 @@ public class ChatbotService {
             }
 
             List<Product> products = productRepository.findByCategoryAndAttributes(
-                    keywords.get("category"), keywords.get("color"), keywords.get("size"));
+                    keywords.get("category"),
+                    keywords.get("color"),
+                    keywords.get("size")
+            );
 
             if (products.isEmpty()) {
                 return "Îmi pare rău, nu am găsit produse care să corespundă exact cerințelor tale. Poți verifica toate rochiile aici: http://localhost:3000/dresses/all";
@@ -55,25 +57,23 @@ public class ChatbotService {
             for (Product product : products) {
                 if (product != null && product.getId() > 0) {
                     productList.append("- ").append(product.getName())
-                            .append(" - http://localhost:3000/ProductDetails/")
+                            .append(" – http://localhost:3000/ProductDetails/")
                             .append(product.getId()).append("\n");
                 }
             }
 
+            String systemPrompt =
+                    "Ești un consultant de modă într-un magazin online. Primești o listă de rochii deja filtrate, fiecare cu un link valid. " +
+                            "Scrie un mesaj prietenos și natural în limba română în care prezinți acele produse. " +
+                            "⚠️ NU adăuga nimic după link (nici punct, virgulă, paranteze etc.). " +
+                            "Linkurile trebuie să apară exact așa cum le primești. " +
+                            "Nu menționa informații despre livrare, parolă sau plată. Doar saluta și prezintă rochiile.";
+
             List<com.theokanning.openai.completion.chat.ChatMessage> messages = List.of(
                     new com.theokanning.openai.completion.chat.ChatMessage(
-                            com.theokanning.openai.completion.chat.ChatMessageRole.SYSTEM.value(),
-                            "Ești un asistent prietenos care ajută clienții să găsească rochii într-un magazin online. " +
-                            "Primești o listă de produse deja filtrate, fiecare cu un link corect. " +
-                                    "Nu modifica linkurile și nu adăuga niciun caracter după ele (punct, paranteză, slash, virgulă etc.). " +
-                                    "Scrie un răspuns natural și politicos în limba română, ca un consultant de modă. " +
-                                    "Fiecare link trebuie să apară exact cum l-ai primit, pe un rând separat sau după numele produsului. " +
-                                    "Dacă utilizatorul întreabă despre livrare, răspunde strict că durează 1-2 zile lucrătoare, fără alte detalii. " +
-                                    "Dacă întreabă despre schimbarea parolei, răspunde că trebuie să meargă în secțiunea Cont → Date personale pentru a o schimba. " +
-                                    "Dacă întreabă despre plată, răspunde că poate plăti online cu cardul sau ramburs la livrare."
-                    ),
+                            com.theokanning.openai.completion.chat.ChatMessageRole.SYSTEM.value(), systemPrompt),
                     new com.theokanning.openai.completion.chat.ChatMessage(
-                            com.theokanning.openai.completion.chat.ChatMessageRole.USER.value(), message),
+                            com.theokanning.openai.completion.chat.ChatMessageRole.USER.value(), "Afiseaza lista de produse:"),
                     new com.theokanning.openai.completion.chat.ChatMessage(
                             com.theokanning.openai.completion.chat.ChatMessageRole.ASSISTANT.value(), productList.toString())
             );
@@ -91,6 +91,7 @@ public class ChatbotService {
                     .getMessage()
                     .getContent();
         }
+
         if (List.of("order", "payment", "delivery", "account").contains(intent)) {
             List<com.theokanning.openai.completion.chat.ChatMessage> messages = List.of(
                     new com.theokanning.openai.completion.chat.ChatMessage(
@@ -115,8 +116,8 @@ public class ChatbotService {
                     .getMessage()
                     .getContent();
         }
-        return "Îmi pare rău, nu am înțeles exact cererea. Poți reformula?";
 
+        return "Îmi pare rău, nu am înțeles exact cererea. Poți reformula?";
     }
 
     private String classifyIntent(String input) {
@@ -147,6 +148,7 @@ public class ChatbotService {
 
     private Map<String, String> extractKeywords(String input) {
         Map<String, String> keywords = new HashMap<>();
+        input = input.toLowerCase();
 
         if (input.contains("day dress") || input.contains("day") || input.contains("zi")
                 || input.contains("rochie de zi") || input.contains("rochii de zi") || input.contains("casual")) {
@@ -158,7 +160,14 @@ public class ChatbotService {
 
         if (input.contains("alb") || input.contains("alba")) keywords.put("color", "white");
         if (input.contains("negru") || input.contains("neagra")) keywords.put("color", "black");
-        if (input.contains("roșu") || input.contains("rosu") || input.contains("roșie")) keywords.put("color", "red");
+        if (input.contains("rosu") || input.contains("roșu") || input.contains("rosie") || input.contains("roșie")) {
+            keywords.put("color", "red");
+        }
+        if (input.contains("galben") || input.contains("galbena")) keywords.put("color", "yellow");
+        if (input.contains("roz")) keywords.put("color", "pink");
+        if (input.contains("albastru") || input.contains("albastra") || input.contains("albastru deschis")) {
+            keywords.put("color", "blue");
+        }
 
         if (input.contains("s ") || input.endsWith(" s")) keywords.put("size", "S");
         if (input.contains("m ") || input.endsWith(" m")) keywords.put("size", "M");

@@ -16,7 +16,6 @@ public class StripeService {
 
     public String createCheckoutSession(List<String> productNames, List<Long> prices, List<Long> quantities) {
         Stripe.apiKey = secretKey;
-
         List<SessionCreateParams.LineItem> lineItems = new java.util.ArrayList<>();
 
         for (int i = 0; i < productNames.size(); i++) {
@@ -37,14 +36,12 @@ public class StripeService {
                             .build()
             );
         }
-
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl("http://localhost:3000/success")
                 .setCancelUrl("http://localhost:3000/cancel")
                 .addAllLineItem(lineItems)
                 .build();
-
         try {
             Session session = Session.create(params);
             return session.getUrl();

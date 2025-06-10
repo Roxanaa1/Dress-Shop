@@ -63,7 +63,7 @@ public class User {
     @Column(name = "VERIFICATION_CODE_EXPIRATION")
     private LocalDateTime verificationCodeExpiration;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "role_id")
     private Role role;
 

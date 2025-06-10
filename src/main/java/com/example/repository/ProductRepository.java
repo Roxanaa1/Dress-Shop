@@ -78,6 +78,4 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategoryAndAttributes(@Param("category") String category,
                                               @Param("color") String color,
                                               @Param("size") String size);
-
-
 }

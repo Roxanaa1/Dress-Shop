@@ -47,34 +47,27 @@ public class ProductService {
         if (product.getCategory() == null || product.getCategory().getName() == null) {
             throw new IllegalArgumentException("Produsul trebuie sa aiba o categorie valida");
         }
-
         Category category = product.getCategory();
         Category existingCategory = categoryRepository.findByName(category.getName());
-
         if (existingCategory == null) {
             existingCategory = categoryRepository.save(category);
         }
         product.setCategory(existingCategory);
-
         if (product.getProductAttributeAttributeValues() != null) {
             for (ProductProductAttribute ppa : product.getProductAttributeAttributeValues()) {
-
                 String attributeName = ppa.getProductAttribute().getName();
                 ProductAttribute attribute = productAttributeRepository.findByName(attributeName)
                         .orElseGet(() -> productAttributeRepository.save(new ProductAttribute(attributeName)));
                 ppa.setProductAttribute(attribute);
-
                 String value = ppa.getAttributeValue().getValue();
                 AttributeValue existingValue = attributeValueRepository.findByValue(value);
                 if (existingValue == null) {
                     existingValue = attributeValueRepository.save(ppa.getAttributeValue());
                 }
                 ppa.setAttributeValue(existingValue);
-
                 ppa.setProduct(product);
             }
         }
-
         return productRepository.save(product);
     }
 
