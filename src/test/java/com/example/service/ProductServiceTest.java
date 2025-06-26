@@ -3,7 +3,6 @@ package com.example.service;
 import com.example.mapper.ProductMapper;
 import com.example.model.*;
 import com.example.repository.*;
-import com.example.service.ProductService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 public class ProductServiceTest {
 
     @Mock

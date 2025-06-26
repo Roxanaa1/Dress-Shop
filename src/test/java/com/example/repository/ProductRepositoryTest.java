@@ -59,7 +59,7 @@ public class ProductRepositoryTest {
         List<Product> results = productRepository.findByCategoryNameIgnoreCase("evening dresses");
 
         assertThat(results).isNotEmpty();
-        assertThat(results.get(0).getCategory().getName()).isEqualToIgnoringCase("Evening Dresses"); // ✅ fix
+        assertThat(results.get(0).getCategory().getName()).isEqualToIgnoringCase("Evening Dresses");
     }
 
     @Test

@@ -46,9 +46,6 @@ import java.util.Optional;
 
         testUser.setRole(role);
     }
-
-
-
     @AfterEach
     public void tearDown() {
         userRepository.deleteAll();
